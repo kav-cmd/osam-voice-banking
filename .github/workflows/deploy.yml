@@ -1,0 +1,43 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+      - name: Check Python syntax
+        run: |
+          python -m py_compile backend/app/main.py
+          python -m py_compile backend/app/models.py
+          python -m py_compile backend/app/auth.py
+          python -m py_compile backend/app/database.py
+          python -m py_compile backend/app/encryption.py
+          python -m py_compile backend/app/rate_limit.py
+          python -m py_compile backend/app/scripts.py
+          python -m py_compile backend/app/ippb_mock.py
+          python -m py_compile backend/app/compliance.py
+          python -m py_compile backend/app/intent.py
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          curl -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{}'

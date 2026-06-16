@@ -281,6 +281,7 @@
       <div class="header-badge">
         <span class="rbih-label">RBI Innovation Hub</span>
         <span class="ippb-label">IPPB Integrated</span>
+        <button class="acc-btn" id="authBtn" onclick="toggleAuth()" style="margin-top:4px;" aria-label="Login or Register">🔑 Login</button>
       </div>
     </header>
 
@@ -1406,6 +1407,141 @@
     window.addEventListener('load', function() {
       if (document.getElementById('srAnnouncer')) announce('OSAM Voice Banking loaded. Alt 1 Chat, Alt 2 Components, Alt 3 Loan, Alt 4 Compliance, Alt M phone mode.');
     });
+
+    let token = localStorage.getItem('osam_token');
+    let authUser = null;
+
+    function toggleAuth() {
+      const c = document.getElementById('authBtn');
+      if (token && authUser) { logout(); return; }
+      const box = document.getElementById('chatBox');
+      if (!box) return;
+      const welcome = document.getElementById('welcomeMsg');
+      if (welcome) welcome.remove();
+      box.innerHTML = '<div style="padding:20px;text-align:center;">' +
+        '<h2 style="color:#a5b4fc;margin-bottom:16px;">🔑 Login</h2>' +
+        '<input type="text" id="loginUser" placeholder="Username" style="display:block;width:80%;margin:8px auto;padding:10px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-family:inherit;font-size:0.9rem;" />' +
+        '<input type="password" id="loginPass" placeholder="Password" style="display:block;width:80%;margin:8px auto;padding:10px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-family:inherit;font-size:0.9rem;" />' +
+        '<div style="display:flex;gap:8px;justify-content:center;margin-top:12px;">' +
+        '<button class="btn-demo btn-primary btn-md" onclick="doLogin()">Login</button>' +
+        '<button class="btn-demo btn-outline btn-md" onclick="doRegister()">Register</button></div>' +
+        '<div id="authMsg" style="font-size:0.8rem;color:#fbbf24;margin-top:8px;"></div></div>';
+    }
+
+    async function doLogin() {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      const msg = document.getElementById('authMsg');
+      if (!u || !p) { msg.textContent = 'Enter username and password'; return; }
+      try {
+        const form = new URLSearchParams(); form.append('username', u); form.append('password', p);
+        const r = await fetch(API + '/api/auth/login', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:form });
+        if (!r.ok) { const e = await r.json(); msg.textContent = e.detail || 'Login failed'; return; }
+        const data = await r.json();
+        token = data.access_token; authUser = data;
+        localStorage.setItem('osam_token', token);
+        document.getElementById('authBtn').textContent = '👤 ' + data.username;
+        clearChat();
+        addMsg('✅ Logged in as ' + data.username + '. Try Dashboard below.', 'system');
+        document.querySelector('.chips').innerHTML += '<button class="chip" onclick="showDashboard()">📊 Dashboard</button><button class="chip" onclick="showTransactions()">💳 Transactions</button>';
+      } catch(e) { msg.textContent = 'Error: ' + e.message; }
+    }
+
+    async function doRegister() {
+      const u = document.getElementById('loginUser').value.trim();
+      const p = document.getElementById('loginPass').value;
+      const msg = document.getElementById('authMsg');
+      if (!u || !p || p.length < 6) { msg.textContent = 'Username (3+ chars) and password (6+ chars) required'; return; }
+      try {
+        const r = await fetch(API + '/api/auth/register', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p}) });
+        if (!r.ok) { const e = await r.json(); msg.textContent = e.detail[0]?.msg || e.detail || 'Registration failed'; return; }
+        const data = await r.json();
+        token = data.access_token; authUser = data;
+        localStorage.setItem('osam_token', token);
+        document.getElementById('authBtn').textContent = '👤 ' + data.username;
+        clearChat();
+        addMsg('✅ Registered and logged in as ' + data.username + '.', 'system');
+        document.querySelector('.chips').innerHTML += '<button class="chip" onclick="showDashboard()">📊 Dashboard</button><button class="chip" onclick="showTransactions()">💳 Transactions</button>';
+        if (data.role === 'admin') document.querySelector('.chips').innerHTML += '<button class="chip" onclick="showAdminPanel()">⚙ Admin</button>';
+      } catch(e) { msg.textContent = 'Error: ' + e.message; }
+    }
+
+    function logout() {
+      token = null; authUser = null;
+      localStorage.removeItem('osam_token');
+      document.getElementById('authBtn').textContent = '🔑 Login';
+      const chips = document.querySelector('.chips');
+      chips.innerHTML = chips.innerHTML.replace(/<button class="chip" onclick="show(Dashboard|Transactions|AdminPanel)\(\)">[^<]+<\/button>/g, '');
+      clearChat();
+    }
+
+    async function fetchWithAuth(url, opts) {
+      const headers = opts?.headers || {};
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+      return fetch(url, { ...opts, headers });
+    }
+
+    async function showDashboard() {
+      try {
+        const r = await fetchWithAuth(API + '/api/dashboard');
+        if (!r.ok) { addMsg('Please login to view dashboard', 'system error'); return; }
+        const d = await r.json();
+        let html = '📊 <b>Dashboard — ' + d.username + '</b><br><br>';
+        html += 'Applications: ' + d.applications_count + '<br>';
+        if (d.recent_applications?.length) {
+          html += '<br><b>Recent Applications:</b><br>';
+          d.recent_applications.forEach(function(a) {
+            html += '• ' + a.application_id + ' — ₹' + a.amount.toLocaleString() + ' (' + a.status + ')<br>';
+          });
+        }
+        if (d.recent_transactions?.length) {
+          html += '<br><b>Recent Transactions:</b><br>';
+          d.recent_transactions.forEach(function(t) {
+            html += '• ' + (t.txn_type === 'credit' ? '+' : '-') + '₹' + t.amount.toLocaleString() + ' — ' + t.description + '<br>';
+          });
+        }
+        addMsg(html, 'system');
+      } catch(e) { addMsg('Dashboard error: ' + e.message, 'system error'); }
+    }
+
+    async function showTransactions() {
+      try {
+        const r = await fetchWithAuth(API + '/api/transactions');
+        if (!r.ok) { addMsg('Please login to view transactions', 'system error'); return; }
+        const d = await r.json();
+        let html = '💳 <b>Recent Transactions</b><br><br>';
+        if (!d.transactions?.length) { html += 'No transactions yet.'; addMsg(html, 'system'); return; }
+        d.transactions.forEach(function(t) {
+          const sign = t.txn_type === 'credit' ? '+' : '-';
+          html += '<div style="padding:6px 0;border-bottom:1px solid rgba(99,102,241,0.06);">';
+          html += '<span style="color:' + (t.txn_type === 'credit' ? '#86efac' : '#fca5a5') + ';">' + sign + '₹' + t.amount.toLocaleString() + '</span>';
+          html += ' <span style="color:#94a3b8;font-size:0.75rem;">' + t.description + '</span>';
+          html += ' <span style="color:#64748b;font-size:0.65rem;">Bal: ₹' + (t.balance_after || 0).toLocaleString() + '</span>';
+          html += '</div>';
+        });
+        addMsg(html, 'system');
+      } catch(e) { addMsg('Transactions error: ' + e.message, 'system error'); }
+    }
+
+    async function showAdminPanel() {
+      try {
+        const r1 = fetchWithAuth(API + '/api/admin/applications');
+        const r2 = fetchWithAuth(API + '/api/admin/users');
+        const [appsRes, usersRes] = await Promise.all([r1, r2]);
+        if (!appsRes.ok) { addMsg('Admin access required', 'system error'); return; }
+        const apps = await appsRes.json();
+        const users = await usersRes.json();
+        let html = '⚙ <b>Admin Panel</b><br><br><b>Users:</b><br>';
+        users.users?.forEach(function(u) {
+          html += '• ' + u.username + ' (' + u.role + ')<br>';
+        });
+        html += '<br><b>Applications (' + apps.total + '):</b><br>';
+        apps.applications?.forEach(function(a) {
+          html += '• ' + a.application_id + ' — ' + a.name + ' — ₹' + a.amount.toLocaleString() + ' — <span style="color:' + (a.status === 'approved' ? '#86efac' : a.status === 'rejected' ? '#fca5a5' : '#fbbf24') + ';">' + a.status + '</span><br>';
+        });
+        addMsg(html, 'system');
+      } catch(e) { addMsg('Admin panel error: ' + e.message, 'system error'); }
+    }
 
     loadBankData();
     setLang('hi');
