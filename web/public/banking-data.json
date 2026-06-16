@@ -1,0 +1,79 @@
+{
+  "banks": [
+    { "id": "SBI", "name": "State Bank of India", "ifsc_prefix": "SBIN" },
+    { "id": "HDFC", "name": "HDFC Bank", "ifsc_prefix": "HDFC" },
+    { "id": "ICICI", "name": "ICICI Bank", "ifsc_prefix": "ICIC" },
+    { "id": "PNB", "name": "Punjab National Bank", "ifsc_prefix": "PUNB" },
+    { "id": "BOB", "name": "Bank of Baroda", "ifsc_prefix": "BARB" },
+    { "id": "CAN", "name": "Canara Bank", "ifsc_prefix": "CNRB" },
+    { "id": "AXIS", "name": "Axis Bank", "ifsc_prefix": "UTIB" },
+    { "id": "KOTAK", "name": "Kotak Mahindra Bank", "ifsc_prefix": "KKBK" },
+    { "id": "YES", "name": "YES Bank", "ifsc_prefix": "YESB" },
+    { "id": "IPPB", "name": "India Post Payments Bank", "ifsc_prefix": "IPOS" }
+  ],
+  "branches": [
+    { "id": 1, "bank": "SBI", "city": "Delhi", "name": "SBI Connaught Place", "ifsc": "SBIN0001234", "address": "Connaught Place, New Delhi - 110001", "distance": 1.2, "lat": 28.6328, "lng": 77.2197 },
+    { "id": 2, "bank": "HDFC", "city": "Delhi", "name": "HDFC Bank Karol Bagh", "ifsc": "HDFC0005678", "address": "Karol Bagh, New Delhi - 110005", "distance": 3.5, "lat": 28.6519, "lng": 77.1908 },
+    { "id": 3, "bank": "IPPB", "city": "Delhi", "name": "IPPB Delhi Main", "ifsc": "IPOS0000001", "address": "Speed Post Centre, Market Road, New Delhi", "distance": 0.8, "lat": 28.6300, "lng": 77.2200 },
+    { "id": 4, "bank": "ICICI", "city": "Mumbai", "name": "ICICI Bank Nariman Point", "ifsc": "ICIC0009101", "address": "Nariman Point, Mumbai - 400021", "distance": 0.5, "lat": 18.9270, "lng": 72.8150 },
+    { "id": 5, "bank": "IPPB", "city": "Mumbai", "name": "IPPB Mumbai GPO", "ifsc": "IPOS0000002", "address": "GPO, Mumbai - 400001", "distance": 0.8, "lat": 18.9340, "lng": 72.8360 },
+    { "id": 6, "bank": "BOB", "city": "Mumbai", "name": "Bank of Baroda Bandra", "ifsc": "BARB000BAND", "address": "Bandra West, Mumbai - 400050", "distance": 5.2, "lat": 19.0596, "lng": 72.8295 },
+    { "id": 7, "bank": "IPPB", "city": "Chennai", "name": "IPPB Chennai Anna Salai", "ifsc": "IPOS0000003", "address": "Anna Salai, Chennai - 600002", "distance": 2.1, "lat": 13.0827, "lng": 80.2707 },
+    { "id": 8, "bank": "AXIS", "city": "Chennai", "name": "Axis Bank T Nagar", "ifsc": "UTIB0001234", "address": "T Nagar, Chennai - 600017", "distance": 4.0, "lat": 13.0418, "lng": 80.2341 },
+    { "id": 9, "bank": "IPPB", "city": "Kolkata", "name": "IPPB Kolkata GPO", "ifsc": "IPOS0000004", "address": "Kolkata GPO, West Bengal - 700001", "distance": 1.5, "lat": 22.5726, "lng": 88.3639 },
+    { "id": 10, "bank": "PNB", "city": "Kolkata", "name": "PNB Park Street", "ifsc": "PUNB0005678", "address": "Park Street, Kolkata - 700016", "distance": 2.8, "lat": 22.5516, "lng": 88.3532 },
+    { "id": 11, "bank": "IPPB", "city": "Bangalore", "name": "IPPB Bangalore MG Road", "ifsc": "IPOS0000005", "address": "Mahatma Gandhi Road, Bangalore - 560001", "distance": 1.8, "lat": 12.9716, "lng": 77.5946 },
+    { "id": 12, "bank": "KOTAK", "city": "Bangalore", "name": "Kotak Mahindra Indiranagar", "ifsc": "KKBK0001234", "address": "Indiranagar, Bangalore - 560038", "distance": 4.2, "lat": 12.9783, "lng": 77.6408 },
+    { "id": 13, "bank": "IPPB", "city": "Lucknow", "name": "IPPB Lucknow Dak Bhawan", "ifsc": "IPOS0000006", "address": "Dak Bhawan, Lucknow - 226001", "distance": 0.5, "lat": 26.8467, "lng": 80.9462 },
+    { "id": 14, "bank": "YES", "city": "Lucknow", "name": "YES Bank Hazratganj", "ifsc": "YESB0001234", "address": "Hazratganj, Lucknow - 226001", "distance": 1.2, "lat": 26.8528, "lng": 80.9462 },
+    { "id": 15, "bank": "SBI", "city": "Delhi", "name": "SBI Dwarka", "ifsc": "SBIN0005678", "address": "Sector 12, Dwarka, New Delhi - 110075", "distance": 8.5, "lat": 28.5855, "lng": 77.0700 },
+    { "id": 16, "bank": "HDFC", "city": "Mumbai", "name": "HDFC Bank Andheri", "ifsc": "HDFC0009101", "address": "Andheri West, Mumbai - 400058", "distance": 7.8, "lat": 19.1368, "lng": 72.8295 },
+    { "id": 17, "bank": "ICICI", "city": "Chennai", "name": "ICICI Bank Velachery", "ifsc": "ICIC0005678", "address": "Velachery, Chennai - 600042", "distance": 6.3, "lat": 12.9815, "lng": 80.2180 },
+    { "id": 18, "bank": "CAN", "city": "Bangalore", "name": "Canara Bank Koramangala", "ifsc": "CNRB0001234", "address": "Koramangala, Bangalore - 560034", "distance": 3.1, "lat": 12.9352, "lng": 77.6253 },
+    { "id": 19, "bank": "SBI", "city": "Kolkata", "name": "SBI Salt Lake", "ifsc": "SBIN0009101", "address": "Sector 5, Salt Lake, Kolkata - 700091", "distance": 5.5, "lat": 22.5800, "lng": 88.4300 },
+    { "id": 20, "bank": "PNB", "city": "Lucknow", "name": "PNB Gomti Nagar", "ifsc": "PUNB0009101", "address": "Gomti Nagar, Lucknow - 226010", "distance": 4.0, "lat": 26.8500, "lng": 81.0000 }
+  ],
+  "customers": [
+    { "id": 1, "name": "Rajesh Kumar", "city": "Delhi", "age": 34, "pan": "ABCDE1234F", "aadhaar": "123456789012", "phone": "9876543210", "email": "rajesh@email.com", "account_type": "savings", "bank": "IPPB", "balance": 15250.75, "status": "active" },
+    { "id": 2, "name": "Priya Sharma", "city": "Mumbai", "age": 28, "pan": "FGHIJ5678K", "aadhaar": "234567890123", "phone": "9876543211", "email": "priya@email.com", "account_type": "salary", "bank": "HDFC", "balance": 48200.00, "status": "active" },
+    { "id": 3, "name": "Amit Singh", "city": "Chennai", "age": 45, "pan": "KLMNO9012P", "aadhaar": "345678901234", "phone": "9876543212", "email": "amit@email.com", "account_type": "current", "bank": "ICICI", "balance": 125000.00, "status": "active" },
+    { "id": 4, "name": "Sunita Devi", "city": "Kolkata", "age": 52, "pan": "QRSTU3456V", "aadhaar": "456789012345", "phone": "9876543213", "email": "sunita@email.com", "account_type": "savings", "bank": "PNB", "balance": 8100.50, "status": "active" },
+    { "id": 5, "name": "Vikram Patel", "city": "Bangalore", "age": 31, "pan": "WXYZA7890B", "aadhaar": "567890123456", "phone": "9876543214", "email": "vikram@email.com", "account_type": "savings", "bank": "IPPB", "balance": 3250.00, "status": "active" },
+    { "id": 6, "name": "Ananya Gupta", "city": "Lucknow", "age": 26, "pan": "CDEFG1234H", "aadhaar": "678901234567", "phone": "9876543215", "email": "ananya@email.com", "account_type": "salary", "bank": "IPPB", "balance": 67500.00, "status": "active" },
+    { "id": 7, "name": "Manoj Verma", "city": "Delhi", "age": 41, "pan": "IJKLM5678N", "aadhaar": "789012345678", "phone": "9876543216", "email": "manoj@email.com", "account_type": "current", "bank": "SBI", "balance": 210000.00, "status": "active" },
+    { "id": 8, "name": "Kavita Joshi", "city": "Mumbai", "age": 35, "pan": "OPQRS9012T", "aadhaar": "890123456789", "phone": "9876543217", "email": "kavita@email.com", "account_type": "fd", "bank": "BOB", "balance": 500000.00, "status": "active" },
+    { "id": 9, "name": "Rohan Deshmukh", "city": "Pune", "age": 29, "pan": "UVWXY3456Z", "aadhaar": "901234567890", "phone": "9876543218", "email": "rohan@email.com", "account_type": "savings", "bank": "AXIS", "balance": 18200.00, "status": "active" },
+    { "id": 10, "name": "Lakshmi Narayanan", "city": "Chennai", "age": 48, "pan": "ABCDE7890F", "aadhaar": "012345678901", "phone": "9876543219", "email": "lakshmi@email.com", "account_type": "savings", "bank": "IPPB", "balance": 94500.00, "status": "active" },
+    { "id": 11, "name": "Sandeep Yadav", "city": "Lucknow", "age": 38, "pan": "GHIJK1234L", "aadhaar": "112345678901", "phone": "9876543220", "email": "sandeep@email.com", "account_type": "rd", "bank": "IPPB", "balance": 45000.00, "status": "active" },
+    { "id": 12, "name": "Pooja Mehta", "city": "Ahmedabad", "age": 30, "pan": "MNOPQ5678R", "aadhaar": "212345678901", "phone": "9876543221", "email": "pooja@email.com", "account_type": "savings", "bank": "KOTAK", "balance": 32100.00, "status": "active" },
+    { "id": 13, "name": "Arun Nair", "city": "Kochi", "age": 36, "pan": "STUVW9012X", "aadhaar": "312345678901", "phone": "9876543222", "email": "arun@email.com", "account_type": "salary", "bank": "ICICI", "balance": 78900.00, "status": "active" },
+    { "id": 14, "name": "Deepa Rao", "city": "Bangalore", "age": 33, "pan": "YZABC3456D", "aadhaar": "412345678901", "phone": "9876543223", "email": "deepa@email.com", "account_type": "current", "bank": "HDFC", "balance": 156000.00, "status": "active" },
+    { "id": 15, "name": "Ravi Shankar", "city": "Delhi", "age": 55, "pan": "EFGHI7890J", "aadhaar": "512345678901", "phone": "9876543224", "email": "ravi@email.com", "account_type": "fd", "bank": "IPPB", "balance": 850000.00, "status": "active" },
+    { "id": 16, "name": "Neha Agarwal", "city": "Jaipur", "age": 27, "pan": "KLMNO1234P", "aadhaar": "612345678901", "phone": "9876543225", "email": "neha@email.com", "account_type": "savings", "bank": "PNB", "balance": 28750.00, "status": "active" },
+    { "id": 17, "name": "Suresh Reddy", "city": "Hyderabad", "age": 42, "pan": "QRSTU5678V", "aadhaar": "712345678901", "phone": "9876543226", "email": "suresh@email.com", "account_type": "current", "bank": "YES", "balance": 430000.00, "status": "active" },
+    { "id": 18, "name": "Kavya Iyer", "city": "Chennai", "age": 24, "pan": "WXYZA9012B", "aadhaar": "812345678901", "phone": "9876543227", "email": "kavya@email.com", "account_type": "savings", "bank": "IPPB", "balance": 12500.00, "status": "active" },
+    { "id": 19, "name": "Gurpreet Singh", "city": "Chandigarh", "age": 39, "pan": "CDEFG3456H", "aadhaar": "912345678901", "phone": "9876543228", "email": "gurpreet@email.com", "account_type": "salary", "bank": "SBI", "balance": 62100.00, "status": "active" },
+    { "id": 20, "name": "Fatima Khan", "city": "Mumbai", "age": 32, "pan": "IJKLM7890N", "aadhaar": "013245678901", "phone": "9876543229", "email": "fatima@email.com", "account_type": "savings", "bank": "IPPB", "balance": 44000.00, "status": "active" }
+  ],
+  "loanProducts": [
+    { "id": "personal", "name": "Personal Loan", "minAmount": 10000, "maxAmount": 1500000, "interestRate": 10.5, "minTenure": 6, "maxTenure": 60, "processingFee": 2.0, "description": "Unsecured loan for personal expenses, medical emergencies, or travel" },
+    { "id": "home", "name": "Home Loan", "minAmount": 500000, "maxAmount": 50000000, "interestRate": 8.5, "minTenure": 12, "maxTenure": 360, "processingFee": 0.5, "description": "Finance your dream home with competitive interest rates" },
+    { "id": "vehicle", "name": "Vehicle Loan", "minAmount": 50000, "maxAmount": 3000000, "interestRate": 9.0, "minTenure": 12, "maxTenure": 84, "processingFee": 1.0, "description": "Two-wheeler or four-wheeler loan with quick approval" },
+    { "id": "education", "name": "Education Loan", "minAmount": 25000, "maxAmount": 5000000, "interestRate": 11.0, "minTenure": 12, "maxTenure": 180, "processingFee": 0.0, "description": "Pursue higher education in India or abroad" },
+    { "id": "business", "name": "Business Loan", "minAmount": 50000, "maxAmount": 10000000, "interestRate": 12.5, "minTenure": 6, "maxTenure": 120, "processingFee": 1.5, "description": "Working capital or expansion for your business" }
+  ],
+  "accountTypes": [
+    { "id": "savings", "name": "Savings Account", "minBalance": 500, "interestRate": 3.5, "features": ["Free ATM withdrawals", "Mobile banking", "Chequebook"] },
+    { "id": "current", "name": "Current Account", "minBalance": 5000, "interestRate": 0.0, "features": ["Overdraft facility", "Unlimited transactions", "Business banking"] },
+    { "id": "salary", "name": "Salary Account", "minBalance": 0, "interestRate": 3.5, "features": ["Zero balance", "Free debit card", "Personal accident cover"] },
+    { "id": "fd", "name": "Fixed Deposit", "minBalance": 1000, "interestRate": 6.5, "features": ["Guaranteed returns", "Loan against FD", "Flexible tenure"] },
+    { "id": "rd", "name": "Recurring Deposit", "minBalance": 100, "interestRate": 6.0, "features": ["Monthly savings", "Compounded quarterly", "Maturity calculator"] }
+  ],
+  "transactions": [
+    { "id": "TXN001", "customer_id": 1, "type": "credit", "method": "UPI", "amount": 5000.00, "date": "2026-06-15", "description": "Salary credit", "status": "completed" },
+    { "id": "TXN002", "customer_id": 1, "type": "debit", "method": "NEFT", "amount": 2000.00, "date": "2026-06-14", "description": "Rent payment", "status": "completed" },
+    { "id": "TXN003", "customer_id": 1, "type": "debit", "method": "ATM", "amount": 500.00, "date": "2026-06-13", "description": "ATM withdrawal", "status": "completed" },
+    { "id": "TXN004", "customer_id": 2, "type": "credit", "method": "IMPS", "amount": 15000.00, "date": "2026-06-16", "description": "Freelance payment", "status": "completed" },
+    { "id": "TXN005", "customer_id": 2, "type": "debit", "method": "UPI", "amount": 3500.00, "date": "2026-06-15", "description": "Grocery purchase", "status": "completed" }
+  ]
+}

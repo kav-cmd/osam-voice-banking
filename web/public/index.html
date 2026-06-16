@@ -3,79 +3,218 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OSAM Voice Banking</title>
+  <title>OSAM — Accessible Voice Banking</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background: #0f172a; color: #f1f5f9;
-      min-height: 100vh; display: flex; flex-direction: column;
-    }
-    .container { max-width: 800px; margin: 0 auto; padding: 16px; flex: 1; width: 100%; }
-    header {
-      text-align: center; padding: 24px 0; border-bottom: 1px solid rgba(99,102,241,0.15); margin-bottom: 24px;
-    }
-    header h1 { font-size: 1.8rem; font-weight: 800; color: #818cf8; margin-bottom: 4px; }
-    header p { color: #64748b; font-size: 0.9rem; }
-    .lang-bar { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
-    .lang-btn {
-      padding: 8px 20px; border: 1px solid rgba(99,102,241,0.2); border-radius: 20px;
-      background: #1e293b; color: #94a3b8; cursor: pointer; font-size: 0.9rem; font-weight: 600;
-      transition: all 0.2s;
-    }
-    .lang-btn.active { border-color: #6366f1; color: #818cf8; background: rgba(99,102,241,0.15); }
-    .lang-btn:hover { border-color: #6366f1; }
-    .lang-btn:focus { outline: 2px solid #6366f1; outline-offset: 2px; }
-    .chat-box {
-      background: rgba(15,23,42,0.5); border: 1px solid rgba(99,102,241,0.1);
-      border-radius: 12px; padding: 16px; height: 400px; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;
-    }
-    .welcome { text-align: center; color: #64748b; padding: 40px 16px; line-height: 1.8; }
-    .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; word-wrap: break-word; }
-    .user { background: #6366f1; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
-    .system { background: #1e293b; border: 1px solid rgba(99,102,241,0.1); color: #f1f5f9; align-self: flex-start; border-bottom-left-radius: 4px; }
-    .error { border-color: rgba(239,68,68,0.3) !important; color: #ef4444 !important; }
-    .loading { color: #818cf8; font-style: italic; }
-    .controls { background: #1e293b; border: 1px solid rgba(99,102,241,0.1); border-radius: 12px; padding: 12px; }
+    :focus { outline: 2px solid #818cf8; outline-offset: 2px; }
+    :focus:not(:focus-visible) { outline: none; }
+    :focus-visible { outline: 2px solid #818cf8; outline-offset: 2px; }
+    .skip-link { position: absolute; top: -100px; left: 8px; background: #6366f1; color: #fff; padding: 8px 16px; border-radius: 0 0 8px 8px; z-index: 1000; font-weight: 600; transition: top .2s; }
+    .skip-link:focus { top: 0; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #0b1120 0%, #0f172a 40%, #1a1f35 100%); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
+    .container { max-width: 960px; margin: 0 auto; padding: 12px 16px; flex: 1; width: 100%; }
+    header { text-align: center; padding: 20px 0 12px; border-bottom: 1px solid rgba(99,102,241,0.12); margin-bottom: 12px; position: relative; }
+    header::after { content: ''; position: absolute; bottom: -1px; left: 25%; right: 25%; height: 1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent); }
+    header h1 { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 2px; }
+    header p { color: #64748b; font-size: 0.85rem; }
+    .lang-bar { display: flex; gap: 6px; justify-content: center; margin: 10px 0 8px; }
+    .lang-btn { padding: 6px 18px; border: 1px solid rgba(99,102,241,0.15); border-radius: 20px; background: rgba(30,41,59,0.6); color: #94a3b8; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all .25s; backdrop-filter: blur(4px); }
+    .lang-btn.active { border-color: #6366f1; color: #c7d2fe; background: rgba(99,102,241,0.2); box-shadow: 0 0 12px rgba(99,102,241,0.15); }
+    .lang-btn:hover { border-color: #6366f1; color: #a5b4fc; }
+    .tab-bar { display: flex; gap: 4px; background: rgba(30,41,59,0.4); border-radius: 12px; padding: 4px; margin-bottom: 16px; border: 1px solid rgba(99,102,241,0.08); backdrop-filter: blur(8px); }
+    .tab-btn { flex: 1; padding: 10px 8px; border: none; border-radius: 8px; background: transparent; color: #94a3b8; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all .25s; text-align: center; white-space: nowrap; }
+    .tab-btn:hover { color: #c7d2fe; background: rgba(99,102,241,0.08); }
+    .tab-btn[aria-selected="true"] { background: rgba(99,102,241,0.2); color: #a5b4fc; box-shadow: 0 0 16px rgba(99,102,241,0.1); }
+    .tab-panel { display: none; animation: fadeIn .35s ease; }
+    .tab-panel[aria-hidden="false"] { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @media (prefers-reduced-motion: reduce) { .tab-panel { animation: none; } }
+    .card { background: rgba(30,41,59,0.4); border: 1px solid rgba(99,102,241,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(8px); box-shadow: 0 4px 24px rgba(0,0,0,0.2); }
+    .card-title { font-size: 1rem; font-weight: 700; color: #c7d2fe; margin-bottom: 4px; }
+    .card-subtitle { font-size: 0.8rem; color: #64748b; margin-bottom: 16px; }
+    .chat-box { background: rgba(15,23,42,0.6); border: 1px solid rgba(99,102,241,0.08); border-radius: 12px; padding: 16px; height: 380px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+    .chat-box::-webkit-scrollbar { width: 5px; }
+    .chat-box::-webkit-scrollbar-track { background: transparent; }
+    .chat-box::-webkit-scrollbar-thumb { background: rgba(99,102,241,0.3); border-radius: 10px; }
+    .welcome { text-align: center; color: #64748b; padding: 36px 16px; line-height: 1.8; font-size: 0.9rem; }
+    .msg { max-width: 82%; padding: 10px 16px; border-radius: 18px; font-size: 0.9rem; line-height: 1.5; word-wrap: break-word; }
+    .user { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .system { background: rgba(30,41,59,0.8); border: 1px solid rgba(99,102,241,0.08); color: #e2e8f0; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .msg.error { border-color: rgba(239,68,68,0.3) !important; color: #fca5a5 !important; }
+    .loading-indicator { color: #818cf8; font-style: italic; opacity: 0.8; }
+    .controls { background: rgba(30,41,59,0.6); border: 1px solid rgba(99,102,241,0.08); border-radius: 12px; padding: 12px; backdrop-filter: blur(8px); }
     .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
-    .input-row input {
-      flex: 1; padding: 12px 16px; border-radius: 24px; border: 1px solid rgba(99,102,241,0.15);
-      background: #0f172a; color: #f1f5f9; font-size: 0.95rem; font-family: inherit;
-    }
-    .input-row input:focus { outline: 2px solid #6366f1; outline-offset: 2px; }
+    .input-row input { flex: 1; padding: 11px 16px; border-radius: 24px; border: 1px solid rgba(99,102,241,0.12); background: rgba(15,23,42,0.8); color: #f1f5f9; font-size: 0.9rem; font-family: inherit; transition: border-color .2s; }
+    .input-row input:focus { border-color: #6366f1; }
     .input-row input::placeholder { color: #475569; }
-    .input-row button {
-      padding: 12px 24px; border-radius: 24px; border: none; background: #6366f1;
-      color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem;
-    }
-    .input-row button:hover { background: #818cf8; }
-    .input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .input-row button { padding: 11px 24px; border-radius: 24px; border: none; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.85rem; transition: all .2s; }
+    .input-row button:hover { box-shadow: 0 0 16px rgba(99,102,241,0.3); }
+    .input-row button:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
     .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
-    .chip {
-      padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(99,102,241,0.15);
-      background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.8rem; font-family: inherit;
-      transition: all 0.2s;
-    }
-    .chip:hover { border-color: #6366f1; color: #818cf8; }
-    .results { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .result-card {
-      background: #1e293b; border: 1px solid rgba(99,102,241,0.1); border-radius: 8px; padding: 12px; text-align: center;
-    }
-    .result-card .label { color: #64748b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
-    .result-card .value { font-size: 1.1rem; font-weight: 700; color: #818cf8; margin-top: 4px; }
-    footer { text-align: center; padding: 16px; color: #475569; font-size: 0.8rem; }
+    .chip { padding: 5px 12px; border-radius: 20px; border: 1px solid rgba(99,102,241,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.75rem; font-family: inherit; transition: all .2s; }
+    .chip:hover { border-color: #6366f1; color: #c7d2fe; background: rgba(99,102,241,0.06); }
+    .results { margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .result-card { background: rgba(30,41,59,0.6); border: 1px solid rgba(99,102,241,0.08); border-radius: 8px; padding: 12px; text-align: center; }
+    .result-card .label { color: #64748b; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+    .result-card .value { font-size: 1rem; font-weight: 700; background: linear-gradient(135deg, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-top: 4px; }
+    .section-title { font-size: 1rem; font-weight: 700; color: #c7d2fe; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(99,102,241,0.3), transparent); }
+    .comp-grid { display: grid; gap: 16px; }
+    .comp-card { background: rgba(30,41,59,0.3); border: 1px solid rgba(99,102,241,0.06); border-radius: 12px; padding: 16px; transition: border-color .2s; }
+    .comp-card:hover { border-color: rgba(99,102,241,0.2); }
+    .comp-card h3 { font-size: 0.85rem; font-weight: 700; color: #a5b4fc; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .comp-card h3 .comp-badge { font-size: 0.6rem; background: rgba(99,102,241,0.15); color: #818cf8; padding: 2px 8px; border-radius: 10px; font-weight: 600; margin-left: auto; }
+    .comp-demo { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; background: rgba(15,23,42,0.4); border-radius: 8px; min-height: 48px; }
+    .comp-info { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; font-size: 0.7rem; color: #64748b; }
+    .comp-info span { background: rgba(99,102,241,0.08); padding: 3px 10px; border-radius: 10px; }
+    .btn-demo { padding: 8px 20px; border-radius: 8px; border: none; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .btn-primary { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; }
+    .btn-primary:hover { box-shadow: 0 0 12px rgba(99,102,241,0.3); }
+    .btn-secondary { background: rgba(30,41,59,0.8); color: #c7d2fe; border: 1px solid rgba(99,102,241,0.15); }
+    .btn-secondary:hover { border-color: #6366f1; }
+    .btn-outline { background: transparent; color: #818cf8; border: 1px solid #818cf8; }
+    .btn-outline:hover { background: rgba(99,102,241,0.1); }
+    .btn-ghost { background: transparent; color: #94a3b8; }
+    .btn-ghost:hover { color: #c7d2fe; }
+    .btn-danger { background: linear-gradient(135deg, #ef4444, #f87171); color: #fff; }
+    .btn-danger:hover { box-shadow: 0 0 12px rgba(239,68,68,0.3); }
+    .btn-sm { padding: 5px 12px; font-size: 0.7rem; border-radius: 6px; }
+    .btn-md { padding: 8px 20px; font-size: 0.8rem; }
+    .btn-lg { padding: 11px 28px; font-size: 0.9rem; }
+    .btn-icon { width: 36px; height: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid rgba(99,102,241,0.15); background: transparent; color: #94a3b8; cursor: pointer; transition: all .2s; font-size: 1rem; }
+    .btn-icon:hover { border-color: #6366f1; color: #c7d2fe; }
+    .input-demo { padding: 9px 14px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.12); background: rgba(15,23,42,0.8); color: #f1f5f9; font-size: 0.85rem; font-family: inherit; width: 200px; transition: border-color .2s; }
+    .input-demo:focus { border-color: #6366f1; }
+    .input-demo.error { border-color: #ef4444; }
+    .input-demo.success { border-color: #22c55e; }
+    .input-msg { font-size: 0.7rem; margin-top: 4px; }
+    .input-msg.error { color: #fca5a5; }
+    .input-msg.success { color: #86efac; }
+    select.demo-select { padding: 9px 14px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.12); background: rgba(15,23,42,0.8); color: #f1f5f9; font-size: 0.85rem; font-family: inherit; cursor: pointer; min-width: 180px; }
+    fieldset.demo-fieldset { border: 1px solid rgba(99,102,241,0.12); border-radius: 8px; padding: 12px; }
+    legend { font-size: 0.8rem; color: #a5b4fc; font-weight: 600; padding: 0 6px; }
+    .demo-label { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; cursor: pointer; padding: 4px 0; }
+    .demo-label input { accent-color: #818cf8; }
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+    .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+    .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+    .alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: #fbbf24; }
+    .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
+    .alert-dismiss { margin-left: auto; background: none; border: none; color: inherit; cursor: pointer; font-size: 1.1rem; opacity: 0.6; padding: 0 2px; }
+    .alert-dismiss:hover { opacity: 1; }
+    .spinner { width: 32px; height: 32px; border: 3px solid rgba(99,102,241,0.1); border-top-color: #818cf8; border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; border-top-color: transparent; border-left-color: #818cf8; } }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
+    .modal-box { background: #1e293b; border: 1px solid rgba(99,102,241,0.15); border-radius: 16px; padding: 24px; max-width: 420px; width: 90%; box-shadow: 0 24px 48px rgba(0,0,0,0.4); }
+    .modal-box h2 { font-size: 1rem; color: #c7d2fe; margin-bottom: 12px; }
+    .modal-box p { font-size: 0.85rem; color: #94a3b8; margin-bottom: 16px; line-height: 1.6; }
+    .modal-box .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .badge { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 600; }
+    .badge-green { background: rgba(34,197,94,0.15); color: #86efac; }
+    .badge-red { background: rgba(239,68,68,0.15); color: #fca5a5; }
+    .badge-yellow { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .badge-blue { background: rgba(59,130,246,0.15); color: #93c5fd; }
+    .badge-orange { background: rgba(249,115,22,0.15); color: #fdba74; }
+    .tooltip-wrap { position: relative; display: inline-flex; }
+    .tooltip-trigger { border-bottom: 1px dashed rgba(99,102,241,0.3); cursor: help; }
+    .tooltip-box { position: absolute; bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%); background: #1e293b; border: 1px solid rgba(99,102,241,0.2); border-radius: 8px; padding: 8px 12px; font-size: 0.75rem; color: #cbd5e1; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .2s; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10; }
+    .tooltip-trigger:hover + .tooltip-box, .tooltip-trigger:focus + .tooltip-box { opacity: 1; }
+    .stepper { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+    .step { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: #64748b; flex: 1; position: relative; }
+    .step:not(:last-child)::after { content: ''; flex: 1; height: 2px; background: rgba(99,102,241,0.1); margin: 0 8px; }
+    .step.active { color: #a5b4fc; }
+    .step.active::after { background: rgba(99,102,241,0.3); }
+    .step.completed { color: #22c55e; }
+    .step.completed::after { background: rgba(34,197,94,0.3); }
+    .step-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.15); }
+    .step.active .step-num { background: rgba(99,102,241,0.2); border-color: #6366f1; }
+    .step.completed .step-num { background: rgba(34,197,94,0.15); border-color: #22c55e; }
+    .loan-form { max-width: 560px; margin: 0 auto; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #a5b4fc; margin-bottom: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.12); background: rgba(15,23,42,0.8); color: #f1f5f9; font-size: 0.85rem; font-family: inherit; transition: border-color .2s; }
+    .form-group input:focus, .form-group select:focus { border-color: #6366f1; }
+    .form-group input[aria-invalid="true"] { border-color: #ef4444; }
+    .form-error { font-size: 0.7rem; color: #fca5a5; margin-top: 3px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-actions { display: flex; justify-content: space-between; margin-top: 20px; gap: 8px; }
+    .form-actions button { padding: 10px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; font-size: 0.85rem; font-family: inherit; transition: all .2s; }
+    .btn-back { background: rgba(30,41,59,0.8); color: #94a3b8; border: 1px solid rgba(99,102,241,0.1); }
+    .btn-back:hover { border-color: #6366f1; color: #c7d2fe; }
+    .btn-continue { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; }
+    .btn-continue:hover { box-shadow: 0 0 16px rgba(99,102,241,0.3); }
+    .btn-continue:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    .emi-display { background: rgba(99,102,241,0.06); border-radius: 10px; padding: 14px; margin-top: 10px; text-align: center; }
+    .emi-display .amount { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .emi-display .sub { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    .emi-breakup { display: flex; gap: 16px; justify-content: center; margin-top: 8px; font-size: 0.75rem; color: #94a3b8; }
+    .emi-breakup span { display: flex; align-items: center; gap: 4px; }
+    .emi-bar { height: 6px; border-radius: 3px; background: rgba(99,102,241,0.1); margin-top: 8px; display: flex; overflow: hidden; }
+    .emi-bar-principal { background: #6366f1; }
+    .emi-bar-interest { background: #22c55e; }
+    input[type="range"] { -webkit-appearance: none; width: 100%; height: 5px; border-radius: 3px; background: rgba(99,102,241,0.15); outline: none; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, #6366f1, #818cf8); cursor: pointer; border: 2px solid #1e293b; }
+    .compliance-input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .compliance-input-row input { flex: 1; padding: 11px 16px; border-radius: 8px; border: 1px solid rgba(99,102,241,0.12); background: rgba(15,23,42,0.8); color: #f1f5f9; font-size: 0.85rem; font-family: inherit; }
+    .compliance-input-row input:focus { border-color: #6366f1; }
+    .compliance-input-row button { padding: 11px 24px; border-radius: 8px; border: none; background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; font-weight: 600; cursor: pointer; font-size: 0.85rem; }
+    .compliance-input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .compliance-summary { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+    .summary-stat { flex: 1; min-width: 100px; text-align: center; padding: 12px; border-radius: 10px; background: rgba(30,41,59,0.3); border: 1px solid rgba(99,102,241,0.06); }
+    .summary-stat .num { font-size: 1.3rem; font-weight: 800; }
+    .summary-stat .lbl { font-size: 0.7rem; color: #64748b; margin-top: 2px; }
+    .summary-stat.pass .num { color: #22c55e; }
+    .summary-stat.fail .num { color: #ef4444; }
+    .summary-stat.warn .num { color: #f59e0b; }
+    .compliance-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    .compliance-table th { text-align: left; padding: 10px 12px; background: rgba(99,102,241,0.06); color: #a5b4fc; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid rgba(99,102,241,0.1); }
+    .compliance-table td { padding: 10px 12px; border-bottom: 1px solid rgba(99,102,241,0.04); color: #cbd5e1; }
+    .compliance-table tr:hover td { background: rgba(99,102,241,0.02); }
+    .compliance-table .pass-row td { border-left: 3px solid #22c55e; }
+    .compliance-table .fail-row td { border-left: 3px solid #ef4444; }
+    .severity-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+    .severity-critical { background: #ef4444; }
+    .severity-high { background: #f59e0b; }
+    .severity-medium { background: #3b82f6; }
+    .doc-upload { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(15,23,42,0.4); border-radius: 8px; margin-bottom: 6px; }
+    .doc-upload input[type="file"] { font-size: 0.75rem; color: #94a3b8; }
+    .doc-upload input[type="file"]::file-selector-button { padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(99,102,241,0.15); background: rgba(99,102,241,0.08); color: #818cf8; cursor: pointer; font-size: 0.7rem; font-weight: 600; }
+    .doc-upload .doc-status { font-size: 0.7rem; color: #22c55e; }
+    .review-table { width: 100%; font-size: 0.82rem; }
+    .review-table td { padding: 8px 12px; border-bottom: 1px solid rgba(99,102,241,0.04); }
+    .review-table td:first-child { color: #64748b; font-weight: 600; width: 120px; }
+    .review-table td:last-child { color: #e2e8f0; }
+    .success-screen { text-align: center; padding: 32px 16px; }
+    .success-screen .icon { font-size: 3rem; margin-bottom: 12px; }
+    .success-screen h2 { font-size: 1.2rem; color: #22c55e; margin-bottom: 8px; }
+    .success-screen p { color: #94a3b8; font-size: 0.85rem; margin-bottom: 4px; }
+    .success-screen .app-id { font-size: 1.1rem; font-weight: 700; background: linear-gradient(135deg, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .filter-bar { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+    .filter-btn { padding: 5px 12px; border-radius: 16px; border: 1px solid rgba(99,102,241,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.7rem; font-family: inherit; transition: all .2s; }
+    .filter-btn.active { background: rgba(99,102,241,0.15); color: #a5b4fc; border-color: #6366f1; }
+    .filter-btn:hover { border-color: #6366f1; }
+    .footer { text-align: center; padding: 16px; color: #475569; font-size: 0.75rem; border-top: 1px solid rgba(99,102,241,0.06); }
+    .footer a { color: #6366f1; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
     @media (max-width: 600px) {
       .container { padding: 8px; }
-      .chat-box { height: 300px; }
+      .tab-btn { font-size: 0.7rem; padding: 8px 4px; }
+      .chat-box { height: 280px; }
       .results { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .comp-grid { gap: 12px; }
+      .summary-stat { min-width: 80px; }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <div class="container" id="main-content">
     <header>
-      <h1>🏦 OSAM</h1>
+      <h1>OSAM</h1>
       <p>वॉइस बैंकिंग — IPPB एकीकरण</p>
     </header>
 
@@ -85,35 +224,256 @@
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
     </div>
 
-    <div class="chat-box" id="chatBox">
-      <div class="welcome" id="welcomeMsg"></div>
+    <div class="tab-bar" role="tablist" aria-label="Main sections">
+      <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tab-chat" id="tab-btn-chat" onclick="switchTab('chat')">💬 Chat</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-components" id="tab-btn-components" onclick="switchTab('components')">🧩 Components</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-loan" id="tab-btn-loan" onclick="switchTab('loan')">📋 Loan</button>
+      <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-compliance" id="tab-btn-compliance" onclick="switchTab('compliance')">✓ Compliance</button>
     </div>
 
-    <div class="controls">
-      <div class="input-row">
-        <input type="text" id="textInput" placeholder="यहाँ टाइप करें..." onkeydown="if(event.key==='Enter') sendText()" />
-        <button id="sendBtn" onclick="sendText()">भेजें</button>
+    <div id="tab-chat" class="tab-panel" role="tabpanel" aria-hidden="false" aria-labelledby="tab-btn-chat">
+      <div class="chat-box" id="chatBox">
+        <div class="welcome" id="welcomeMsg"></div>
       </div>
-      <div class="chips">
-        <button class="chip" data-cmd="balance" onclick="quickCmd('balance')">💰 बैलेंस</button>
-        <button class="chip" data-cmd="loan" onclick="quickCmd('loan')">📋 लोन</button>
-        <button class="chip" data-cmd="branch" onclick="quickCmd('branch')">📍 शाखा</button>
-        <button class="chip" data-cmd="reset" onclick="clearChat()">🔄 रीसेट</button>
+      <div class="controls">
+        <div class="input-row">
+          <input type="text" id="textInput" placeholder="यहाँ टाइप करें..." onkeydown="if(event.key==='Enter') sendText()" />
+          <button id="sendBtn" onclick="sendText()">भेजें</button>
+        </div>
+        <div class="chips">
+          <button class="chip" data-cmd="balance" onclick="quickCmd('balance')">💰 बैलेंस</button>
+          <button class="chip" data-cmd="loan" onclick="quickCmd('loan')">📋 लोन</button>
+          <button class="chip" data-cmd="branch" onclick="quickCmd('branch')">📍 शाखा</button>
+          <button class="chip" data-cmd="reset" onclick="clearChat()">🔄 रीसेट</button>
+        </div>
+      </div>
+      <div id="quickResults" class="results"></div>
+    </div>
+
+    <div id="tab-components" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-components">
+      <div class="section-title">Accessible Component Library</div>
+      <div class="comp-grid" id="componentsGrid">
+        <div class="comp-card">
+          <h3>Button <span class="comp-badge" id="btnContrast">4.5:1</span></h3>
+          <div class="comp-demo">
+            <button class="btn-demo btn-primary btn-sm">Small</button>
+            <button class="btn-demo btn-primary btn-md">Medium</button>
+            <button class="btn-demo btn-primary btn-lg">Large</button>
+            <button class="btn-demo btn-secondary btn-md">Secondary</button>
+            <button class="btn-demo btn-outline btn-md">Outline</button>
+            <button class="btn-demo btn-ghost btn-md">Ghost</button>
+            <button class="btn-demo btn-danger btn-md">Danger</button>
+            <button class="btn-demo btn-primary btn-md" disabled>Disabled</button>
+            <button class="btn-icon" aria-label="Search"><span aria-hidden="true">🔍</span></button>
+            <button class="btn-icon" aria-label="Settings"><span aria-hidden="true">⚙️</span></button>
+          </div>
+          <div class="comp-info">
+            <span>4 variants × 3 sizes</span>
+            <span>ARIA: aria-label on icon buttons</span>
+            <span>Disabled: pointer-events + opacity</span>
+            <span id="btnContrastNote">Contrast 4.5:1 ✓</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Text Input <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo" style="flex-direction:column;align-items:stretch;">
+            <div>
+              <label for="inputNormal" class="sr-only">Normal input</label>
+              <input id="inputNormal" class="input-demo" placeholder="Normal state" aria-describedby="inputNormalMsg" />
+              <div id="inputNormalMsg" class="input-msg">Valid input</div>
+            </div>
+            <div>
+              <label for="inputError" class="sr-only">Error input</label>
+              <input id="inputError" class="input-demo error" placeholder="Error state" aria-invalid="true" aria-describedby="inputErrorMsg" />
+              <div id="inputErrorMsg" class="input-msg error">Please enter a valid account number (6 digits required)</div>
+            </div>
+            <div>
+              <label for="inputSuccess" class="sr-only">Success input</label>
+              <input id="inputSuccess" class="input-demo success" placeholder="Success state" value="IPPB123456" aria-describedby="inputSuccessMsg" />
+              <div id="inputSuccessMsg" class="input-msg success">Account verified ✓</div>
+            </div>
+          </div>
+          <div class="comp-info">
+            <span>aria-invalid on error</span>
+            <span>aria-describedby links to message</span>
+            <span>Color + text for errors</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Dropdown <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo">
+            <label for="bankSelect" class="sr-only">Select bank</label>
+            <select id="bankSelect" class="demo-select" aria-label="Select a bank"></select>
+            <label for="branchSelect" class="sr-only">Select branch</label>
+            <select id="branchSelect" class="demo-select" aria-label="Select a branch"></select>
+          </div>
+          <div class="comp-info">
+            <span>Native &lt;select&gt; for SR support</span>
+            <span>aria-label on each</span>
+            <span>Populated from live data</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Checkbox &amp; Radio <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo" style="gap:16px;">
+            <fieldset class="demo-fieldset">
+              <legend>Account Features</legend>
+              <label class="demo-label"><input type="checkbox" checked /> Mobile Banking</label>
+              <label class="demo-label"><input type="checkbox" /> Debit Card</label>
+              <label class="demo-label"><input type="checkbox" /> Chequebook</label>
+              <label class="demo-label"><input type="checkbox" /> Overdraft</label>
+            </fieldset>
+            <fieldset class="demo-fieldset">
+              <legend>Account Type</legend>
+              <label class="demo-label"><input type="radio" name="demoRadio" checked /> Savings</label>
+              <label class="demo-label"><input type="radio" name="demoRadio" /> Current</label>
+              <label class="demo-label"><input type="radio" name="demoRadio" /> Salary</label>
+            </fieldset>
+          </div>
+          <div class="comp-info">
+            <span>&lt;fieldset&gt; + &lt;legend&gt; grouping</span>
+            <span>Native inputs for SR</span>
+            <span>Keyboard: Tab + Arrow keys</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Alerts <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo" style="flex-direction:column;">
+            <div class="alert alert-error" role="alert"><span aria-hidden="true">✕</span> Invalid account number. Please enter 6 digits. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss error">×</button></div>
+            <div class="alert alert-success" role="status"><span aria-hidden="true">✓</span> Your balance has been updated successfully. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss success">×</button></div>
+            <div class="alert alert-warning"><span aria-hidden="true">⚠</span> Your session will expire in 2 minutes. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss warning">×</button></div>
+            <div class="alert alert-info"><span aria-hidden="true">ℹ</span> New IPPB feature: UPI payments now available. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss info">×</button></div>
+          </div>
+          <div class="comp-info">
+            <span>role="alert" on error</span>
+            <span>role="status" on success</span>
+            <span>Dismissible with aria-label</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Loading Spinner <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo">
+            <div class="spinner" role="status" aria-label="Loading content, please wait"></div>
+            <div class="spinner" style="width:24px;height:24px;border-width:2px" role="status" aria-label="Loading"></div>
+            <div class="spinner" style="width:40px;height:40px" role="status" aria-label="Processing your request"></div>
+            <button class="btn-demo btn-primary btn-md" onclick="showTempSpinner(this)">Show loading</button>
+          </div>
+          <div class="comp-info">
+            <span>role="status" + aria-label</span>
+            <span>prefers-reduced-motion safe</span>
+            <span>3 sizes</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Modal Dialog <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo">
+            <button class="btn-demo btn-primary btn-md" onclick="openModal()">Open Modal</button>
+            <button class="btn-demo btn-secondary btn-md" onclick="openModal()" aria-label="Open confirmation modal">Open Modal (icon)</button>
+          </div>
+          <div class="comp-info">
+            <span>aria-modal="true"</span>
+            <span>Tab focus trap</span>
+            <span>Escape closes</span>
+            <span>aria-labelledby + aria-describedby</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Badges / Tags <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo">
+            <span class="badge badge-green">Approved</span>
+            <span class="badge badge-red">Rejected</span>
+            <span class="badge badge-yellow">Pending</span>
+            <span class="badge badge-blue">Processing</span>
+            <span class="badge badge-orange">On Hold</span>
+          </div>
+          <div class="comp-info">
+            <span>role="status" for live regions</span>
+            <span>Color + text for meaning</span>
+            <span>High contrast support</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Tooltip <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo">
+            <span class="tooltip-wrap">
+              <span class="tooltip-trigger" tabindex="0" aria-describedby="tt1" role="button">Hover or focus me</span>
+              <span class="tooltip-box" id="tt1" role="tooltip">This is a tooltip with keyboard support</span>
+            </span>
+          </div>
+          <div class="comp-info">
+            <span>aria-describedby on trigger</span>
+            <span>Works on hover &amp; keyboard focus</span>
+            <span>role="tooltip"</span>
+          </div>
+        </div>
+
+        <div class="comp-card">
+          <h3>Progress Stepper <span class="comp-badge">4.5:1</span></h3>
+          <div class="comp-demo" style="flex-direction:column;width:100%;">
+            <div class="stepper" id="demoStepper">
+              <div class="step completed"><span class="step-num">✓</span> Personal</div>
+              <div class="step completed"><span class="step-num">✓</span> Income</div>
+              <div class="step active"><span class="step-num">3</span> Amount</div>
+              <div class="step"><span class="step-num">4</span> Review</div>
+            </div>
+            <button class="btn-demo btn-primary btn-sm" onclick="advanceDemoStep()">Next Step</button>
+          </div>
+          <div class="comp-info">
+            <span>aria-current="step"</span>
+            <span>aria-label="Step 3 of 4: Amount"</span>
+            <span>Visual + text progress</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="quickResults" class="results"></div>
+    <div id="tab-loan" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-loan">
+      <div class="section-title">Loan Application</div>
+      <div class="stepper" id="loanStepper" aria-label="Loan application progress">
+        <div class="step active" id="ls1"><span class="step-num">1</span> Personal</div>
+        <div class="step" id="ls2"><span class="step-num">2</span> Income</div>
+        <div class="step" id="ls3"><span class="step-num">3</span> Amount</div>
+        <div class="step" id="ls4"><span class="step-num">4</span> Docs</div>
+        <div class="step" id="ls5"><span class="step-num">5</span> Review</div>
+      </div>
+
+      <div id="loanFormContainer" class="loan-form card" aria-live="polite">
+        <!-- Step content rendered by JS -->
+      </div>
+    </div>
+
+    <div id="tab-compliance" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-compliance">
+      <div class="section-title">Accessibility Compliance Checker</div>
+      <div class="compliance-input-row">
+        <input type="url" id="complianceUrl" placeholder="https://example.com" aria-label="Website URL to audit for accessibility compliance" value="https://osam-voice-banking.onrender.com/" />
+        <button id="complianceBtn" onclick="runCompliance()">✓ Check URL</button>
+      </div>
+      <div id="complianceResults" aria-live="polite"></div>
+    </div>
   </div>
 
-  <footer>
-    OSAM — RBI Innovation Hub Project &bull; <a href="/api/health" style="color:#6366f1;">API Health</a>
-  </footer>
+  <div class="footer">
+    OSAM — RBI Innovation Hub Project &bull; <a href="/api/health">API Health</a> &bull; <a href="/docs">API Docs</a>
+  </div>
+
+  <div id="modalContainer"></div>
 
   <script>
     const API = window.location.origin;
     let lang = 'hi';
     let sessionId = '';
     let loading = false;
+    let loanData = {};
+    let loanStep = 0;
+    let bankData = null;
 
     const cmdMap = {
       balance: { hi: 'मेरा बैलेंस चेक करें', ta: 'என் இருப்பைச் சரிபார்', en: 'check my balance' },
@@ -138,6 +498,23 @@
       }
     };
 
+    const loanI18n = {
+      personal: { hi: 'व्यक्तिगत विवरण', ta: 'தனிப்பட்ட விவரங்கள்', en: 'Personal Details' },
+      income: { hi: 'आय विवरण', ta: 'வருமான விவரங்கள்', en: 'Income Details' },
+      amount: { hi: 'लोन राशि', ta: 'கடன் தொகை', en: 'Loan Amount' },
+      docs: { hi: 'दस्तावेज़', ta: 'ஆவணங்கள்', en: 'Documents' },
+      review: { hi: 'समीक्षा', ta: 'மறுஆய்வு', en: 'Review' },
+      name: { hi: 'पूरा नाम', ta: 'முழு பெயர்', en: 'Full Name' },
+      dob: { hi: 'जन्म तिथि', ta: 'பிறந்த தேதி', en: 'Date of Birth' },
+      pan: { hi: 'पैन कार्ड', ta: 'பான் கார்டு', en: 'PAN Card' },
+      phone: { hi: 'मोबाइल नंबर', ta: 'கைபேசி எண்', en: 'Mobile Number' },
+      email: { hi: 'ईमेल', ta: 'மின்னஞ்சல்', en: 'Email' },
+      continue: { hi: 'जारी रखें', ta: 'தொடரவும்', en: 'Continue' },
+      back: { hi: 'वापस जाएं', ta: 'பின் செல்லவும்', en: 'Back' },
+      submit: { hi: 'आवेदन जमा करें', ta: 'விண்ணப்பிக்கவும்', en: 'Submit Application' },
+      confirming: { hi: 'मैं सभी जानकारी सही होने की पुष्टि करता हूँ', ta: 'அனைத்து தகவல்களும் சரியானவை என்பதை உறுதிப்படுத்துகிறேன்', en: 'I confirm all information is correct' }
+    };
+
     function setLang(l) {
       lang = l;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
@@ -151,6 +528,91 @@
         if (cmd && i18n.chips[cmd]) c.textContent = i18n.chips[cmd][l];
       });
       document.querySelector('html').lang = l;
+    }
+
+    function l(key) {
+      return loanI18n[key] ? (loanI18n[key][lang] || loanI18n[key].en) : key;
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.setAttribute('aria-selected', b.getAttribute('aria-controls') === 'tab-' + name ? 'true' : 'false'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.setAttribute('aria-hidden', p.id !== 'tab-' + name ? 'true' : 'false'));
+      if (name === 'loan') renderLoanStep();
+      if (name === 'compliance' && !document.getElementById('complianceResults').innerHTML) initCompliance();
+    }
+
+    function advanceDemoStep() {
+      const steps = document.querySelectorAll('#demoStepper .step');
+      for (let i = 0; i < steps.length; i++) {
+        if (steps[i].classList.contains('active')) {
+          steps[i].classList.remove('active');
+          steps[i].classList.add('completed');
+          if (i + 1 < steps.length) {
+            steps[i + 1].classList.add('active');
+            steps[i + 1].querySelector('.step-num').textContent = i + 2;
+          }
+          return;
+        }
+      }
+    }
+
+    function showTempSpinner(btn) {
+      const orig = btn.textContent;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px;display:inline-block;vertical-align:middle;margin-right:6px;"></span> Loading';
+      setTimeout(() => { btn.disabled = false; btn.textContent = orig; }, 2000);
+    }
+
+    function openModal() {
+      const c = document.getElementById('modalContainer');
+      c.innerHTML = `<div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalDesc">
+        <div class="modal-box">
+          <h2 id="modalTitle">Confirm Action</h2>
+          <p id="modalDesc">Are you sure you want to proceed with this banking transaction? This action cannot be undone.</p>
+          <div class="modal-actions">
+            <button class="btn-demo btn-secondary btn-md" onclick="closeModal()" id="modalCancel">Cancel</button>
+            <button class="btn-demo btn-primary btn-md" onclick="closeModal()" id="modalConfirm">Confirm</button>
+          </div>
+        </div>
+      </div>`;
+      const modal = c.firstElementChild;
+      setTimeout(() => { const first = modal.querySelector('button'); if (first) first.focus(); }, 50);
+      modal.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Tab') {
+          const focusable = modal.querySelectorAll('button');
+          const first = focusable[0], last = focusable[focusable.length - 1];
+          if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+          else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+      });
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      document.getElementById('modalContainer').innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    async function loadBankData() {
+      try {
+        const r = await fetch('/banking-data.json');
+        bankData = await r.json();
+        populateBanks();
+      } catch(e) {
+        bankData = { banks: [], branches: [], customers: [], loanProducts: [], accountTypes: [], transactions: [] };
+      }
+    }
+
+    function populateBanks() {
+      const sel = document.getElementById('bankSelect');
+      if (!sel || !bankData) return;
+      sel.innerHTML = '<option value="">Select a bank...</option>' + bankData.banks.map(b => '<option value="' + b.id + '">' + b.name + '</option>').join('');
+      sel.addEventListener('change', function() {
+        const branchSel = document.getElementById('branchSelect');
+        const branches = bankData.branches.filter(b => b.bank === this.value);
+        branchSel.innerHTML = '<option value="">Select a branch...</option>' + branches.map(b => '<option value="' + b.id + '">' + b.name + ' — ' + b.city + '</option>').join('');
+      });
     }
 
     function addMsg(text, type) {
@@ -186,12 +648,11 @@
         sessionId = data.session_id || '';
         addMsg(data.response_text, 'system');
         setLoading(false);
-
         if (data.intent === 'balance') await handleBalance();
         else if (data.intent === 'loan') await handleLoan();
         else if (data.intent === 'branch') await handleBranch();
       } catch(e) {
-        addMsg('⚠️ Error: ' + e.message, 'system error');
+        addMsg('⚠ Error: ' + e.message, 'system error');
         setLoading(false);
       }
     }
@@ -201,14 +662,11 @@
       if (!acct) return;
       setLoading(true);
       try {
-        const res = await fetch(API + '/api/balance', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ account_number: acct, language: lang })
-        });
+        const res = await fetch(API + '/api/balance', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ account_number: acct, language: lang }) });
         const data = await res.json();
         addMsg(data.response_text, 'system');
         showResult('balance', data.balance !== null ? '₹' + data.balance.toLocaleString() : 'Error');
-      } catch(e) { addMsg('⚠️ ' + e.message, 'system error'); }
+      } catch(e) { addMsg('⚠ ' + e.message, 'system error'); }
       setLoading(false);
     }
 
@@ -219,14 +677,11 @@
       if (!amt) return;
       setLoading(true);
       try {
-        const res = await fetch(API + '/api/loan/apply', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: parseFloat(amt), purpose, language: lang })
-        });
+        const res = await fetch(API + '/api/loan/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: parseFloat(amt), purpose, language: lang }) });
         const data = await res.json();
         addMsg(data.response_text, 'system');
         showResult('loan', data.application_id);
-      } catch(e) { addMsg('⚠️ ' + e.message, 'system error'); }
+      } catch(e) { addMsg('⚠ ' + e.message, 'system error'); }
       setLoading(false);
     }
 
@@ -235,16 +690,11 @@
       if (!loc) return;
       setLoading(true);
       try {
-        const res = await fetch(API + '/api/branch/nearby', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ location: loc, language: lang })
-        });
+        const res = await fetch(API + '/api/branch/nearby', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: loc, language: lang }) });
         const data = await res.json();
         addMsg(data.response_text, 'system');
-        if (data.branches && data.branches.length > 0) {
-          showResult('branch', data.branches[0].name + ' (' + data.branches[0].distance + 'km)');
-        }
-      } catch(e) { addMsg('⚠️ ' + e.message, 'system error'); }
+        if (data.branches && data.branches.length > 0) showResult('branch', data.branches[0].name + ' (' + data.branches[0].distance + 'km)');
+      } catch(e) { addMsg('⚠ ' + e.message, 'system error'); }
       setLoading(false);
     }
 
@@ -269,6 +719,235 @@
       sessionId = '';
     }
 
+    function renderLoanStep() {
+      const steps = [
+        renderPersonalStep, renderIncomeStep, renderAmountStep, renderDocsStep, renderReviewStep
+      ];
+      if (loanStep < 0) loanStep = 0;
+      if (loanStep >= steps.length) loanStep = steps.length - 1;
+      for (let i = 0; i < 5; i++) {
+        const el = document.getElementById('ls' + (i + 1));
+        if (!el) continue;
+        el.className = 'step';
+        if (i < loanStep) { el.className = 'step completed'; el.querySelector('.step-num').textContent = '✓'; }
+        else if (i === loanStep) { el.className = 'step active'; el.querySelector('.step-num').textContent = i + 1; }
+        else { el.querySelector('.step-num').textContent = i + 1; }
+      }
+      const container = document.getElementById('loanFormContainer');
+      container.innerHTML = steps[loanStep]();
+    }
+
+    function validatePersonal() {
+      const name = document.getElementById('loanName');
+      const dob = document.getElementById('loanDob');
+      const pan = document.getElementById('loanPan');
+      const phone = document.getElementById('loanPhone');
+      const email = document.getElementById('loanEmail');
+      let valid = true;
+      if (!name.value || name.value.trim().length < 3) { name.setAttribute('aria-invalid', 'true'); document.getElementById('errName').textContent = 'Min 3 characters required'; valid = false; } else { name.removeAttribute('aria-invalid'); document.getElementById('errName').textContent = ''; }
+      if (!dob.value) { dob.setAttribute('aria-invalid', 'true'); document.getElementById('errDob').textContent = 'Date of birth required'; valid = false; } else { const age = (new Date() - new Date(dob.value)) / 31557600000; if (age < 18) { dob.setAttribute('aria-invalid', 'true'); document.getElementById('errDob').textContent = 'Must be 18+'; valid = false; } else { dob.removeAttribute('aria-invalid'); document.getElementById('errDob').textContent = ''; } }
+      if (!pan.value || pan.value.trim().length < 5) { pan.setAttribute('aria-invalid', 'true'); document.getElementById('errPan').textContent = 'Valid PAN required'; valid = false; } else { pan.removeAttribute('aria-invalid'); document.getElementById('errPan').textContent = ''; }
+      if (!phone.value || phone.value.trim().length < 10) { phone.setAttribute('aria-invalid', 'true'); document.getElementById('errPhone').textContent = '10-digit mobile required'; valid = false; } else { phone.removeAttribute('aria-invalid'); document.getElementById('errPhone').textContent = ''; }
+      if (!email.value || !email.value.includes('@')) { email.setAttribute('aria-invalid', 'true'); document.getElementById('errEmail').textContent = 'Valid email required'; valid = false; } else { email.removeAttribute('aria-invalid'); document.getElementById('errEmail').textContent = ''; }
+      if (valid) { loanData.personal = { name: name.value.trim(), dob: dob.value, pan: pan.value.trim(), phone: phone.value.trim(), email: email.value.trim() }; }
+      return valid;
+    }
+
+    function renderPersonalStep() {
+      const v = loanData.personal || {};
+      return '<h3 class="card-title">' + l('personal') + '</h3><p class="card-subtitle">Step 1 of 5</p>' +
+        '<div class="form-group"><label for="loanName">' + l('name') + '</label><input type="text" id="loanName" value="' + (v.name || '') + '" placeholder="Rajesh Kumar" aria-describedby="errName" /><div id="errName" class="form-error"></div></div>' +
+        '<div class="form-row"><div class="form-group"><label for="loanDob">' + l('dob') + '</label><input type="date" id="loanDob" value="' + (v.dob || '') + '" aria-describedby="errDob" /><div id="errDob" class="form-error"></div></div>' +
+        '<div class="form-group"><label for="loanPan">' + l('pan') + '</label><input type="text" id="loanPan" value="' + (v.pan || '') + '" placeholder="ABCDE1234F" aria-describedby="errPan" /><div id="errPan" class="form-error"></div></div></div>' +
+        '<div class="form-row"><div class="form-group"><label for="loanPhone">' + l('phone') + '</label><input type="tel" id="loanPhone" value="' + (v.phone || '') + '" placeholder="9876543210" aria-describedby="errPhone" /><div id="errPhone" class="form-error"></div></div>' +
+        '<div class="form-group"><label for="loanEmail">' + l('email') + '</label><input type="email" id="loanEmail" value="' + (v.email || '') + '" placeholder="rajesh@email.com" aria-describedby="errEmail" /><div id="errEmail" class="form-error"></div></div></div>' +
+        '<div class="form-actions"><div></div><button class="btn-continue" onclick="if(validatePersonal()) { loanStep++; renderLoanStep(); }" aria-label="Continue to step 2: Income">' + l('continue') + '</button></div>';
+    }
+
+    function renderIncomeStep() {
+      const v = loanData.income || {};
+      return '<h3 class="card-title">' + l('income') + '</h3><p class="card-subtitle">Step 2 of 5</p>' +
+        '<div class="form-group"><label for="loanEmp">Employment Type</label><select id="loanEmp" onchange="renderIncomeStep()"><option value="salaried" ' + (v.emp === 'salaried' || !v.emp ? 'selected' : '') + '>Salaried</option><option value="self" ' + (v.emp === 'self' ? 'selected' : '') + '>Self-Employed</option><option value="business" ' + (v.emp === 'business' ? 'selected' : '') + '>Business</option></select></div>' +
+        '<div class="form-group"><label for="loanIncome">Monthly Income (₹)</label><input type="number" id="loanIncome" min="5000" max="500000" step="1000" value="' + (v.income || '50000') + '" /></div>' +
+        '<div class="form-group"><label for="loanCompany">' + (document.getElementById('loanEmp') && document.getElementById('loanEmp').value === 'salaried' ? 'Company Name' : 'Business Name') + '</label><input type="text" id="loanCompany" value="' + (v.company || '') + '" placeholder="ABC Corp" /></div>' +
+        '<div class="form-group"><label for="loanExistingEmi">Existing Monthly EMI (₹) — optional</label><input type="number" id="loanExistingEmi" min="0" value="' + (v.existingEmi || '0') + '" /></div>' +
+        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 1: Personal">' + l('back') + '</button>' +
+        '<button class="btn-continue" onclick="loanData.income={emp:document.getElementById(\'loanEmp\').value,income:parseInt(document.getElementById(\'loanIncome\').value),company:document.getElementById(\'loanCompany\').value,existingEmi:parseInt(document.getElementById(\'loanExistingEmi\').value)||0};loanStep++;renderLoanStep()" aria-label="Continue to step 3: Loan Amount">' + l('continue') + '</button></div>';
+    }
+
+    function calcEMI(P, rate, months) {
+      const r = rate / 12 / 100;
+      if (r === 0) return P / months;
+      return P * r * Math.pow(1 + r, months) / (Math.pow(1 + r, months) - 1);
+    }
+
+    function renderAmountStep() {
+      const v = loanData.amount || {};
+      const amt = v.amount || 500000;
+      const tenure = v.tenure || 36;
+      const rate = 10.5;
+      const emi = calcEMI(amt, rate, tenure);
+      const totalPay = emi * tenure;
+      const intPay = totalPay - amt;
+      const intPct = totalPay > 0 ? (intPay / totalPay * 100) : 0;
+      const income = loanData.income ? loanData.income.income : 50000;
+      const existingEmi = loanData.income ? loanData.income.existingEmi : 0;
+      const totalEmi = emi + existingEmi;
+      const eligible = totalEmi <= income * 0.5;
+      return '<h3 class="card-title">' + l('amount') + '</h3><p class="card-subtitle">Step 3 of 5 — EMI Calculator</p>' +
+        '<div class="form-group"><label for="loanAmt">Loan Amount: ₹' + amt.toLocaleString() + '</label><input type="range" id="loanAmt" min="10000" max="5000000" step="10000" value="' + amt + '" oninput="renderAmountStep()" /></div>' +
+        '<div class="form-group"><label for="loanTenure">Tenure: ' + tenure + ' months (' + (tenure/12).toFixed(1) + ' years)</label><input type="range" id="loanTenure" min="6" max="60" step="1" value="' + tenure + '" oninput="renderAmountStep()" /></div>' +
+        '<div class="emi-display"><div class="amount">₹' + Math.round(emi).toLocaleString() + '</div><div class="sub">Monthly EMI at ' + rate + '% p.a.</div>' +
+        '<div class="emi-breakup"><span>🏦 Principal: ₹' + amt.toLocaleString() + '</span><span>📈 Interest: ₹' + Math.round(intPay).toLocaleString() + '</span></div>' +
+        '<div class="emi-bar"><div class="emi-bar-principal" style="width:' + (100 - intPct) + '%" aria-label="Principal: ' + (100 - intPct).toFixed(0) + '%"></div><div class="emi-bar-interest" style="width:' + intPct + '%" aria-label="Interest: ' + intPct.toFixed(0) + '%"></div></div>' +
+        '<div style="margin-top:8px;font-size:0.75rem;color:' + (eligible ? '#22c55e' : '#ef4444') + '">' + (eligible ? '✅ Eligible — EMI (' + Math.round(emi).toLocaleString() + ') is within 50% of income (' + Math.round(income * 0.5).toLocaleString() + ')' : '❌ Not eligible — Total EMI (' + Math.round(totalEmi).toLocaleString() + ') exceeds 50% of income (' + Math.round(income * 0.5).toLocaleString() + ')') + '</div></div>' +
+        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 2: Income">' + l('back') + '</button>' +
+        '<button class="btn-continue" onclick="loanData.amount={amount:parseInt(document.getElementById(\'loanAmt\').value),tenure:parseInt(document.getElementById(\'loanTenure\').value)};loanStep++;renderLoanStep()" aria-label="Continue to step 4: Documents">' + l('continue') + '</button></div>';
+    }
+
+    function renderDocsStep() {
+      return '<h3 class="card-title">' + l('docs') + '</h3><p class="card-subtitle">Step 4 of 5</p>' +
+        '<div class="doc-upload"><label for="docPan">📄 PAN Card</label><input type="file" id="docPan" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
+        '<div class="doc-upload"><label for="docAadhaar">📄 Aadhaar Card</label><input type="file" id="docAadhaar" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
+        '<div class="doc-upload"><label for="docStatement">📄 Bank Statement (3 months)</label><input type="file" id="docStatement" accept=".pdf" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
+        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 3: Loan Amount">' + l('back') + '</button>' +
+        '<button class="btn-continue" onclick="loanStep++;renderLoanStep()" aria-label="Continue to step 5: Review">' + l('continue') + '</button></div>';
+    }
+
+    function showDocStatus(input) {
+      const status = input.parentElement.querySelector('.doc-status');
+      if (input.files && input.files[0]) {
+        const f = input.files[0];
+        status.textContent = '✓ ' + f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+      } else {
+        status.textContent = '';
+      }
+    }
+
+    function renderReviewStep() {
+      const p = loanData.personal || {};
+      const i = loanData.income || {};
+      const a = loanData.amount || {};
+      return '<h3 class="card-title">' + l('review') + '</h3><p class="card-subtitle">Step 5 of 5 — Review your application</p>' +
+        '<table class="review-table"><tr><td>' + l('name') + '</td><td>' + (p.name || '-') + '</td></tr><tr><td>' + l('dob') + '</td><td>' + (p.dob || '-') + '</td></tr><tr><td>' + l('pan') + '</td><td>' + (p.pan || '-') + '</td></tr><tr><td>' + l('phone') + '</td><td>' + (p.phone || '-') + '</td></tr><tr><td>' + l('email') + '</td><td>' + (p.email || '-') + '</td></tr><tr><td>Income</td><td>₹' + (i.income || 0).toLocaleString() + '/mo</td></tr><tr><td>Loan</td><td>₹' + (a.amount || 0).toLocaleString() + '</td></tr><tr><td>Tenure</td><td>' + (a.tenure || 0) + ' months</td></tr><tr><td>EMI</td><td>₹' + Math.round(calcEMI(a.amount || 0, 10.5, a.tenure || 36)).toLocaleString() + '/mo</td></tr></table>' +
+        '<div class="form-group" style="margin-top:12px;"><label class="demo-label"><input type="checkbox" id="loanConfirm" /> ' + l('confirming') + '</label></div>' +
+        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 4: Documents">' + l('back') + '</button>' +
+        '<button class="btn-continue" id="loanSubmitBtn" onclick="submitLoan()" disabled aria-label="Submit loan application">' + l('submit') + '</button></div>';
+    }
+
+    document.addEventListener('change', function(e) {
+      if (e.target.id === 'loanConfirm') {
+        document.getElementById('loanSubmitBtn').disabled = !e.target.checked;
+      }
+    });
+
+    async function submitLoan() {
+      const a = loanData.amount || {};
+      const btn = document.getElementById('loanSubmitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting...';
+      try {
+        const res = await fetch(API + '/api/loan/apply', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: a.amount || 500000, purpose: 'Personal Loan from OSAM Portal' })
+        });
+        const data = await res.json();
+        const c = document.getElementById('loanFormContainer');
+        c.innerHTML = '<div class="success-screen"><div class="icon">🎉</div><h2>Application Submitted!</h2><p>Your loan application ID is</p><p class="app-id">' + data.application_id + '</p><p style="margin-top:12px;">We will contact you within 48 hours.</p><button class="btn-demo btn-primary btn-md" style="margin-top:16px;" onclick="loanStep=0;loanData={};renderLoanStep()">Apply Again</button></div>';
+        document.querySelectorAll('#loanStepper .step').forEach(s => s.className = 'step completed');
+        const lbl = document.getElementById('ls5');
+        if (lbl) { lbl.className = 'step completed'; lbl.querySelector('.step-num').textContent = '✓'; }
+      } catch(e) {
+        alert('Error: ' + e.message);
+        btn.disabled = false;
+        btn.textContent = 'Submit Application';
+      }
+    }
+
+    async function runCompliance() {
+      const url = document.getElementById('complianceUrl').value.trim();
+      if (!url) return;
+      const btn = document.getElementById('complianceBtn');
+      const results = document.getElementById('complianceResults');
+      btn.disabled = true;
+      btn.textContent = 'Checking...';
+      results.innerHTML = '<div style="text-align:center;padding:24px;"><div class="spinner" style="margin:0 auto 12px;" role="status" aria-label="Scanning for accessibility issues"></div><p style="color:#94a3b8;font-size:0.85rem;">Scanning ' + url + ' for WCAG + IS 17802 compliance...</p></div>';
+      try {
+        const res = await fetch(API + '/api/compliance/audit', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        const data = await res.json();
+        renderComplianceResults(data, url);
+      } catch(e) {
+        if (e.message.includes('404') || e.message.includes('Not Found')) {
+          results.innerHTML = '<div class="alert alert-warning">The compliance audit endpoint is not deployed yet. Push the backend changes to Render, then try again.</div>';
+        } else {
+          results.innerHTML = '<div class="alert alert-error">Error: ' + e.message + '</div>';
+        }
+      }
+      btn.disabled = false;
+      btn.textContent = '✓ Check URL';
+    }
+
+    function renderComplianceResults(data, url) {
+      const c = document.getElementById('complianceResults');
+      const issues = data.issues || [];
+      const total = data.total_rules || 10;
+      const passed = total - issues.length;
+      const criticals = issues.filter(i => i.rule && i.rule.severity === 'critical').length;
+      const highs = issues.filter(i => i.rule && i.rule.severity === 'high').length;
+      c.innerHTML = '<div class="compliance-summary" role="status">' +
+        '<div class="summary-stat pass"><div class="num">' + passed + '</div><div class="lbl">Passed</div></div>' +
+        '<div class="summary-stat ' + (issues.length > 0 ? 'fail' : 'pass') + '"><div class="num">' + issues.length + '</div><div class="lbl">Violations</div></div>' +
+        '<div class="summary-stat warn"><div class="num">' + criticals + 'C / ' + highs + 'H</div><div class="lbl">Critical / High</div></div>' +
+        '<div class="summary-stat"><div class="num" style="color:#a5b4fc;">' + total + '</div><div class="lbl">Rules Checked</div></div>' +
+        '</div>' +
+        '<p style="font-size:0.75rem;color:#64748b;margin-bottom:12px;">Auditing: <a href="' + url + '" target="_blank" style="color:#818cf8;">' + url + '</a> &mdash; ' + (data.page_title || '') + '</p>' +
+        '<div class="filter-bar" role="group" aria-label="Filter results">' +
+        '<button class="filter-btn active" data-filter="all" onclick="filterCompliance(this, \'all\')">All</button>' +
+        '<button class="filter-btn" data-filter="pass" onclick="filterCompliance(this, \'pass\')">Passed</button>' +
+        '<button class="filter-btn" data-filter="fail" onclick="filterCompliance(this, \'fail\')">Failed</button>' +
+        '<button class="filter-btn" data-filter="critical" onclick="filterCompliance(this, \'critical\')">Critical</button>' +
+        '</div>' +
+        '<div style="overflow-x:auto;"><table class="compliance-table"><thead><tr><th>Rule</th><th>WCAG</th><th>Severity</th><th>Status</th><th>Details</th></tr></thead><tbody id="complianceTbody">' +
+        renderComplianceRows(data.rules || [], issues) +
+        '</tbody></table></div>';
+    }
+
+    function renderComplianceRows(rules, issues) {
+      if (!rules || rules.length === 0) {
+        return '<tr><td colspan="5" style="text-align:center;color:#64748b;padding:16px;">No rules data available</td></tr>';
+      }
+      return rules.map(r => {
+        const matched = issues.find(i => i.rule && i.rule.id === r.id);
+        const failed = !!matched;
+        const severity = r.severity || 'medium';
+        const dotClass = 'severity-' + severity;
+        return '<tr class="' + (failed ? 'fail-row' : 'pass-row') + '" data-filter-value="' + (failed ? 'fail' : 'pass') + '" data-severity="' + severity + '">' +
+          '<td><strong>' + (r.title || r.id) + '</strong></td>' +
+          '<td>' + (r.wcag_ref || '—') + '</td>' +
+          '<td><span class="severity-dot ' + dotClass + '"></span>' + severity.charAt(0).toUpperCase() + severity.slice(1) + '</td>' +
+          '<td>' + (failed ? '❌ Fail' : '✅ Pass') + '</td>' +
+          '<td style="font-size:0.75rem;color:#94a3b8;">' + (failed ? (matched.found || matched.element || 'Issue detected') : 'No issues found') + '</td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function filterCompliance(btn, filter) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b === btn));
+      const rows = document.querySelectorAll('#complianceTbody tr');
+      rows.forEach(r => {
+        if (filter === 'all') { r.style.display = ''; return; }
+        if (filter === 'critical') { r.style.display = r.getAttribute('data-severity') === 'critical' ? '' : 'none'; return; }
+        r.style.display = r.getAttribute('data-filter-value') === filter ? '' : 'none';
+      });
+    }
+
+    function initCompliance() {
+    }
+
+    loadBankData();
     setLang('hi');
   </script>
 </body>

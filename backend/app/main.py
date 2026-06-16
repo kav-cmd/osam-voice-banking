@@ -4,6 +4,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Optional
 
+import httpx
 from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
@@ -14,7 +15,7 @@ from .intent import detect_intent
 from .ippb_mock import get_balance, apply_loan, get_nearby_branches
 from .voice import transcribe, load_asr
 from .tts import text_to_speech
-from .compliance import generate_accessibility_report, IS_17802_RULES
+from .compliance import generate_accessibility_report, IS_17802_RULES, audit_url
 from fastapi.responses import HTMLResponse
 
 logging.basicConfig(level=logging.INFO)
@@ -107,6 +108,10 @@ class ComplianceResponse(BaseModel):
     standard: str
     total_rules: int
     rules: list
+
+
+class ComplianceAuditRequest(BaseModel):
+    url: str
 
 
 SESSION_STORE: dict[str, dict] = {}
@@ -274,6 +279,17 @@ async def check_compliance():
     """
     report = generate_accessibility_report(sample_html)
     return report
+
+
+@app.post("/api/compliance/audit")
+async def compliance_audit(req: ComplianceAuditRequest):
+    try:
+        report = await audit_url(req.url)
+        return report
+    except httpx.HTTPError as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch URL: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Audit failed: {str(e)}")
 
 
 @app.post("/api/voice/upload")

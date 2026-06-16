@@ -1,4 +1,5 @@
 import re
+import httpx
 from typing import Any
 
 IS_17802_RULES = {
@@ -119,4 +120,48 @@ def generate_accessibility_report(html_content: str) -> dict:
         "issues_found": len(issues),
         "issues": issues,
         "passed": len(issues) == 0,
+    }
+
+
+def extract_title(html_content: str) -> str:
+    m = re.search(r'<title[^>]*>([^<]+)</title>', html_content, re.IGNORECASE)
+    return m.group(1).strip() if m else ""
+
+
+async def audit_url(target_url: str) -> dict:
+    async with httpx.AsyncClient(timeout=15, follow_redirects=True) as client:
+        resp = await client.get(target_url, headers={
+            "User-Agent": "OSAM-Compliance-Audit/1.0",
+            "Accept": "text/html,application/xhtml+xml",
+        })
+        resp.raise_for_status()
+        html = resp.text
+
+    report = generate_accessibility_report(html)
+    rules_with_details = []
+    for key, rule in IS_17802_RULES.items():
+        matching_issue = None
+        for issue in report.get("issues", []):
+            if issue.get("rule", {}).get("id") == rule["id"]:
+                matching_issue = issue
+                break
+        rules_with_details.append({
+            "id": rule["id"],
+            "title": rule["title"],
+            "severity": rule["severity"],
+            "wcag_ref": rule["wcag_ref"],
+            "description": rule["description"],
+            "passed": matching_issue is None,
+            "detail": matching_issue.get("found", "No issues detected") if matching_issue else "No issues detected",
+            "element": matching_issue.get("element", "") if matching_issue else "",
+        })
+
+    return {
+        "url": target_url,
+        "page_title": extract_title(html),
+        "standard": "IS 17802 + WCAG 2.1 AA",
+        "total_rules": len(IS_17802_RULES),
+        "rules": rules_with_details,
+        "issues": report.get("issues", []),
+        "passed": report.get("passed", False),
     }
