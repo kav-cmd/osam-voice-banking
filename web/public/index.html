@@ -76,7 +76,7 @@
   <div class="container">
     <header>
       <h1>🏦 OSAM</h1>
-      <p>Voice Banking — IPPB Integration</p>
+      <p>वॉइस बैंकिंग — IPPB एकीकरण</p>
     </header>
 
     <div class="lang-bar" role="radiogroup" aria-label="Language">
@@ -86,10 +86,7 @@
     </div>
 
     <div class="chat-box" id="chatBox">
-      <div class="welcome" id="welcomeMsg">
-        नमस्कार! मैं OSAM हूँ।<br>
-        कहें: "मेरा बैलेंस चेक करें", "लोन के लिए आवेदन करें", या "निकटतम शाखा खोजें"
-      </div>
+      <div class="welcome" id="welcomeMsg"></div>
     </div>
 
     <div class="controls">
@@ -98,10 +95,10 @@
         <button id="sendBtn" onclick="sendText()">भेजें</button>
       </div>
       <div class="chips">
-        <button class="chip" onclick="quickCmd('balance')">💰 बैलेंस</button>
-        <button class="chip" onclick="quickCmd('loan')">📋 लोन</button>
-        <button class="chip" onclick="quickCmd('branch')">📍 शाखा</button>
-        <button class="chip" onclick="clearChat()">🔄 रीसेट</button>
+        <button class="chip" data-cmd="balance" onclick="quickCmd('balance')">💰 बैलेंस</button>
+        <button class="chip" data-cmd="loan" onclick="quickCmd('loan')">📋 लोन</button>
+        <button class="chip" data-cmd="branch" onclick="quickCmd('branch')">📍 शाखा</button>
+        <button class="chip" data-cmd="reset" onclick="clearChat()">🔄 रीसेट</button>
       </div>
     </div>
 
@@ -124,12 +121,36 @@
       branch: { hi: 'निकटतम शाखा खोजें', ta: 'அருகிலுள்ள கிளையைக் கண்டுபிடி', en: 'find nearest branch' },
     };
 
-    const inputPlaceholders = { hi: 'यहाँ टाइप करें...', ta: 'இங்கே தட்டச்சு செய்க...', en: 'Type here...' };
+    const i18n = {
+      welcome: {
+        hi: 'नमस्कार! मैं OSAM हूँ।<br>कहें: "मेरा बैलेंस चेक करें", "लोन के लिए आवेदन करें", या "निकटतम शाखा खोजें"',
+        ta: 'வணக்கம்! நான் OSAM.<br>சொல்லுங்கள்: "என் இருப்பைச் சரிபார்", "கடனுக்கு விண்ணப்பி", அல்லது "அருகிலுள்ள கிளையைக் கண்டுபிடி"',
+        en: 'Hello! I\'m OSAM.<br>Say: "check my balance", "apply for a loan", or "find nearest branch"'
+      },
+      placeholder: { hi: 'यहाँ टाइप करें...', ta: 'இங்கே தட்டச்சு செய்க...', en: 'Type here...' },
+      send: { hi: 'भेजें', ta: 'அனுப்பு', en: 'Send' },
+      subtitle: { hi: 'वॉइस बैंकिंग — IPPB एकीकरण', ta: 'குரல் வங்கி — IPPB ஒருங்கிணைப்பு', en: 'Voice Banking — IPPB Integration' },
+      chips: {
+        balance: { hi: '💰 बैलेंस', ta: '💰 இருப்பு', en: '💰 Balance' },
+        loan: { hi: '📋 लोन', ta: '📋 கடன்', en: '📋 Loan' },
+        branch: { hi: '📍 शाखा', ta: '📍 கிளை', en: '📍 Branch' },
+        reset: { hi: '🔄 रीसेट', ta: '🔄 மீட்டமை', en: '🔄 Reset' }
+      }
+    };
 
     function setLang(l) {
       lang = l;
       document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
-      document.getElementById('textInput').placeholder = inputPlaceholders[l];
+      document.getElementById('textInput').placeholder = i18n.placeholder[l];
+      document.getElementById('sendBtn').textContent = i18n.send[l];
+      document.querySelector('header p').textContent = i18n.subtitle[l];
+      const welcome = document.getElementById('welcomeMsg');
+      if (welcome) welcome.innerHTML = i18n.welcome[l];
+      document.querySelectorAll('.chip').forEach(c => {
+        const cmd = c.getAttribute('data-cmd');
+        if (cmd && i18n.chips[cmd]) c.textContent = i18n.chips[cmd][l];
+      });
+      document.querySelector('html').lang = l;
     }
 
     function addMsg(text, type) {
@@ -243,10 +264,12 @@
     function setLoading(v) { loading = v; document.getElementById('sendBtn').disabled = v; }
 
     function clearChat() {
-      document.getElementById('chatBox').innerHTML = '<div class="welcome" id="welcomeMsg">' + document.querySelector('.welcome').textContent + '</div>';
+      document.getElementById('chatBox').innerHTML = '<div class="welcome" id="welcomeMsg">' + i18n.welcome[lang] + '</div>';
       document.getElementById('quickResults').innerHTML = '';
       sessionId = '';
     }
+
+    setLang('hi');
   </script>
 </body>
 </html>
