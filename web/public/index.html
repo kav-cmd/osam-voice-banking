@@ -13,10 +13,19 @@
     .skip-link:focus { top: 0; }
     body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: linear-gradient(135deg, #0b1120 0%, #0f172a 40%, #1a1f35 100%); color: #f1f5f9; min-height: 100vh; display: flex; flex-direction: column; }
     .container { max-width: 960px; margin: 0 auto; padding: 12px 16px; flex: 1; width: 100%; }
-    header { text-align: center; padding: 20px 0 12px; border-bottom: 1px solid rgba(99,102,241,0.12); margin-bottom: 12px; position: relative; }
+    header { display: flex; align-items: center; gap: 12px; padding: 16px 0 12px; border-bottom: 1px solid rgba(99,102,241,0.12); margin-bottom: 12px; position: relative; }
     header::after { content: ''; position: absolute; bottom: -1px; left: 25%; right: 25%; height: 1px; background: linear-gradient(90deg, transparent, rgba(99,102,241,0.4), transparent); }
-    header h1 { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 2px; }
-    header p { color: #64748b; font-size: 0.85rem; }
+    .header-brand { display: flex; align-items: center; gap: 10px; flex: 1; }
+    .rbih-logo { width: 40px; height: 40px; flex-shrink: 0; }
+    .header-text { flex: 1; }
+    header h1 { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #818cf8, #a5b4fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 1px; }
+    header .sub { color: #64748b; font-size: 0.75rem; }
+    .header-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+    .header-badge .rbih-label { font-size: 0.55rem; color: #818cf8; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: rgba(99,102,241,0.1); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(99,102,241,0.15); white-space: nowrap; }
+    .header-badge .ippb-label { font-size: 0.5rem; color: #94a3b8; letter-spacing: 0.5px; }
+    .hc header { border-color: #fff !important; }
+    .hc .rbih-label { border-color: #fff !important; color: #fff !important; background: #333 !important; }
+    .hc .ippb-label { color: #aaa !important; }
     .lang-bar { display: flex; gap: 6px; justify-content: center; margin: 10px 0 8px; }
     .lang-btn { padding: 6px 18px; border: 1px solid rgba(99,102,241,0.15); border-radius: 20px; background: rgba(30,41,59,0.6); color: #94a3b8; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all .25s; backdrop-filter: blur(4px); }
     .lang-btn.active { border-color: #6366f1; color: #c7d2fe; background: rgba(99,102,241,0.2); box-shadow: 0 0 12px rgba(99,102,241,0.15); }
@@ -257,8 +266,22 @@
 
   <main class="container" id="main-content">
     <header>
-      <h1>OSAM</h1>
-      <p>वॉइस बैंकिंग — IPPB एकीकरण</p>
+      <div class="header-brand">
+        <svg class="rbih-logo" viewBox="0 0 40 40" fill="none" aria-label="RBI Innovation Hub logo" role="img">
+          <rect x="2" y="2" width="36" height="36" rx="8" fill="rgba(99,102,241,0.12)" stroke="#818cf8" stroke-width="1.5"/>
+          <text x="20" y="18" text-anchor="middle" fill="#a5b4fc" font-size="10" font-weight="800" font-family="system-ui">RBI</text>
+          <text x="20" y="30" text-anchor="middle" fill="#818cf8" font-size="6" font-weight="600" font-family="system-ui">iHub</text>
+          <circle cx="32" cy="8" r="3" fill="#818cf8" opacity="0.3"/>
+        </svg>
+        <div class="header-text">
+          <h1>OSAM</h1>
+          <div class="sub">Open Source Accessible Banking</div>
+        </div>
+      </div>
+      <div class="header-badge">
+        <span class="rbih-label">RBI Innovation Hub</span>
+        <span class="ippb-label">IPPB Integrated</span>
+      </div>
     </header>
 
     <div class="lang-bar" role="radiogroup" aria-label="Language" style="margin-bottom:4px;">
