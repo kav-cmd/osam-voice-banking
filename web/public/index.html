@@ -197,6 +197,8 @@
     .footer { text-align: center; padding: 16px; color: #475569; font-size: 0.75rem; border-top: 1px solid rgba(99,102,241,0.06); }
     .footer a { color: #6366f1; text-decoration: none; }
     .footer a:hover { text-decoration: underline; }
+    .ivr-key:hover { background: rgba(99,102,241,0.15) !important; border-color: #6366f1 !important; }
+    .ivr-key:active { background: rgba(99,102,241,0.25) !important; transform: scale(0.95); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
     @media (max-width: 600px) {
       .container { padding: 8px; }
@@ -248,6 +250,31 @@
         </div>
       </div>
       <div id="quickResults" class="results"></div>
+      <div class="ivr-bar" id="ivrBar" style="display:none;margin-top:8px;background:rgba(30,41,59,0.6);border:1px solid rgba(99,102,241,0.08);border-radius:12px;padding:12px;text-align:center;">
+        <div style="margin-bottom:8px;font-size:0.75rem;color:#94a3b8;">📞 <span id="ivrStatus">IVR Mode — Press a key</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:240px;margin:0 auto;">
+          <button class="ivr-key" data-key="1" onclick="ivrKey('1')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">1</button>
+          <button class="ivr-key" data-key="2" onclick="ivrKey('2')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">2</button>
+          <button class="ivr-key" data-key="3" onclick="ivrKey('3')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">3</button>
+          <button class="ivr-key" data-key="4" onclick="ivrKey('4')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">4</button>
+          <button class="ivr-key" data-key="5" onclick="ivrKey('5')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">5</button>
+          <button class="ivr-key" data-key="6" onclick="ivrKey('6')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">6</button>
+          <button class="ivr-key" data-key="7" onclick="ivrKey('7')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">7</button>
+          <button class="ivr-key" data-key="8" onclick="ivrKey('8')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">8</button>
+          <button class="ivr-key" data-key="9" onclick="ivrKey('9')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">9</button>
+          <button class="ivr-key" data-key="*" onclick="ivrKey('*')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">*</button>
+          <button class="ivr-key" data-key="0" onclick="ivrKey('0')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">0</button>
+          <button class="ivr-key" data-key="#" onclick="ivrKey('#')" style="padding:12px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-size:1.1rem;font-weight:700;cursor:pointer;font-family:inherit;">#</button>
+        </div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:8px;">
+          <button class="chip" onclick="ivrKey('9')" style="font-size:0.7rem;">🔊 Repeat</button>
+          <button class="chip" onclick="toggleIvrMode()" style="font-size:0.7rem;">✕ Exit IVR</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
+        <button class="chip" id="ivrToggleBtn" onclick="toggleIvrMode()">📞 Phone Mode</button>
+        <button class="chip" id="playLastBtn" onclick="playLastAudio()" style="display:none;">🔊 Play Audio</button>
+      </div>
     </div>
 
     <div id="tab-components" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-components">
@@ -465,6 +492,8 @@
   </div>
 
   <div id="modalContainer"></div>
+  <div id="srAnnouncer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+  <audio id="ttsAudio" preload="none"></audio>
 
   <script>
     const API = window.location.origin;
@@ -474,6 +503,10 @@
     let loanData = {};
     let loanStep = 0;
     let bankData = null;
+    let ivrMode = false;
+    let ivrStep = 'menu';
+    let lastAudioUrl = '';
+    let lastResponseText = '';
 
     const cmdMap = {
       balance: { hi: 'मेरा बैलेंस चेक करें', ta: 'என் இருப்பைச் சரிபார்', en: 'check my balance' },
@@ -528,6 +561,10 @@
         if (cmd && i18n.chips[cmd]) c.textContent = i18n.chips[cmd][l];
       });
       document.querySelector('html').lang = l;
+      if (ivrMode) {
+        const s = document.getElementById('ivrStatus');
+        if (ivrStep === 'menu') s.textContent = '📞 ' + (l === 'hi' ? '1 बैलेंस, 2 लोन, 3 शाखा दबाएं' : l === 'ta' ? '1 இருப்பு, 2 கடன், 3 கிளை அழுத்தவும்' : 'Press 1 balance, 2 loan, 3 branch');
+      }
     }
 
     function l(key) {
@@ -636,6 +673,24 @@
       await processCmd(text);
     }
 
+    function announce(text) {
+      const el = document.getElementById('srAnnouncer');
+      if (el) { el.textContent = ''; setTimeout(() => { el.textContent = text; }, 50); }
+    }
+
+    function playAudio(url) {
+      if (!url) return;
+      lastAudioUrl = url;
+      const audio = document.getElementById('ttsAudio');
+      audio.src = url;
+      audio.play().catch(function(e) {});
+      document.getElementById('playLastBtn').style.display = 'inline-block';
+    }
+
+    function playLastAudio() {
+      if (lastAudioUrl) playAudio(lastAudioUrl);
+    }
+
     async function processCmd(text) {
       setLoading(true);
       try {
@@ -646,7 +701,10 @@
         });
         const data = await res.json();
         sessionId = data.session_id || '';
-        addMsg(data.response_text, 'system');
+        lastResponseText = data.response_text || '';
+        addMsg(lastResponseText, 'system');
+        if (data.audio_url) playAudio(API + data.audio_url);
+        announce(lastResponseText);
         setLoading(false);
         if (data.intent === 'balance') await handleBalance();
         else if (data.intent === 'loan') await handleLoan();
@@ -946,6 +1004,64 @@
 
     function initCompliance() {
     }
+
+    function toggleIvrMode() {
+      ivrMode = !ivrMode;
+      const bar = document.getElementById('ivrBar');
+      const btn = document.getElementById('ivrToggleBtn');
+      bar.style.display = ivrMode ? 'block' : 'none';
+      btn.textContent = ivrMode ? '✕ Exit Phone Mode' : '📞 Phone Mode';
+      if (ivrMode) {
+        ivrStep = 'menu';
+        document.getElementById('ivrStatus').textContent = '📞 IVR Mode — Press 1, 2, or 3';
+        addMsg('📞 Phone mode activated. Use the keypad below.', 'system');
+        announce('Phone mode activated. Press 1 for balance, 2 for loan, 3 for branch.');
+      }
+    }
+
+    function ivrKey(key) {
+      if (loading) return;
+      const status = document.getElementById('ivrStatus');
+      if (key === '0') {
+        ivrStep = 'menu';
+        status.textContent = '📞 Returning to main menu...';
+        processCmd('menu');
+        return;
+      }
+      if (key === '9') {
+        if (lastResponseText) playLastAudio();
+        return;
+      }
+      if (key === '*') {
+        ivrStep = 'menu';
+        status.textContent = '📞 Going back...';
+        processCmd('back');
+        return;
+      }
+      if (key === '#') {
+        toggleIvrMode();
+        return;
+      }
+
+      if (ivrStep === 'menu') {
+        if (key === '1') { ivrStep = 'balance'; status.textContent = '📞 Enter account number...'; processCmd(cmdMap.balance[lang]); }
+        else if (key === '2') { ivrStep = 'loan'; status.textContent = '📞 Loan purpose...'; processCmd(cmdMap.loan[lang]); }
+        else if (key === '3') { ivrStep = 'branch'; status.textContent = '📞 Enter city name...'; processCmd(cmdMap.branch[lang]); }
+        else { status.textContent = '📞 Press 1 for balance, 2 for loan, 3 for branch'; }
+      } else {
+        processCmd(key);
+      }
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (ivrMode && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        const validKeys = ['0','1','2','3','4','5','6','7','8','9','*','#'];
+        if (validKeys.includes(e.key)) {
+          e.preventDefault();
+          ivrKey(e.key);
+        }
+      }
+    });
 
     loadBankData();
     setLang('hi');
