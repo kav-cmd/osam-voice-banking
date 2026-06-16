@@ -1,0 +1,31 @@
+name: osam_mobile
+description: OSAM Voice Banking - IPPB voice banking in Hindi, Tamil, English
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.1.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.2.0
+  vibration: ^2.0.0
+  record: ^5.0.0
+  audioplayers: ^6.0.0
+  provider: ^6.1.0
+  flutter_tts: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: NotoSans
+      fonts:
+        - asset: fonts/NotoSans-Regular.ttf
+        - asset: fonts/NotoSans-Bold.ttf
+          weight: 700

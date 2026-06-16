@@ -1,0 +1,18 @@
+name: OSAM Voice Banking
+description: Voice-enabled banking system for IPPB integration supporting Hindi, Tamil, and English
+repository: https://github.com/kav-cmd/osam-voice-banking
+
+services:
+  - type: web
+    name: osam-api
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    rootDir: backend
+    envVars:
+      - key: PORT
+        value: "8002"
+      - key: PYTHON_VERSION
+        value: "3.11"

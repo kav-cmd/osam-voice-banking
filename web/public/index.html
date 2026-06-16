@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OSAM Voice Banking</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f172a; color: #f1f5f9;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 16px; flex: 1; width: 100%; }
+    header {
+      text-align: center; padding: 24px 0; border-bottom: 1px solid rgba(99,102,241,0.15); margin-bottom: 24px;
+    }
+    header h1 { font-size: 1.8rem; font-weight: 800; color: #818cf8; margin-bottom: 4px; }
+    header p { color: #64748b; font-size: 0.9rem; }
+    .lang-bar { display: flex; gap: 8px; justify-content: center; margin: 12px 0; }
+    .lang-btn {
+      padding: 8px 20px; border: 1px solid rgba(99,102,241,0.2); border-radius: 20px;
+      background: #1e293b; color: #94a3b8; cursor: pointer; font-size: 0.9rem; font-weight: 600;
+      transition: all 0.2s;
+    }
+    .lang-btn.active { border-color: #6366f1; color: #818cf8; background: rgba(99,102,241,0.15); }
+    .lang-btn:hover { border-color: #6366f1; }
+    .lang-btn:focus { outline: 2px solid #6366f1; outline-offset: 2px; }
+    .chat-box {
+      background: rgba(15,23,42,0.5); border: 1px solid rgba(99,102,241,0.1);
+      border-radius: 12px; padding: 16px; height: 400px; overflow-y: auto;
+      display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px;
+    }
+    .welcome { text-align: center; color: #64748b; padding: 40px 16px; line-height: 1.8; }
+    .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.95rem; line-height: 1.5; word-wrap: break-word; }
+    .user { background: #6366f1; color: #fff; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .system { background: #1e293b; border: 1px solid rgba(99,102,241,0.1); color: #f1f5f9; align-self: flex-start; border-bottom-left-radius: 4px; }
+    .error { border-color: rgba(239,68,68,0.3) !important; color: #ef4444 !important; }
+    .loading { color: #818cf8; font-style: italic; }
+    .controls { background: #1e293b; border: 1px solid rgba(99,102,241,0.1); border-radius: 12px; padding: 12px; }
+    .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
+    .input-row input {
+      flex: 1; padding: 12px 16px; border-radius: 24px; border: 1px solid rgba(99,102,241,0.15);
+      background: #0f172a; color: #f1f5f9; font-size: 0.95rem; font-family: inherit;
+    }
+    .input-row input:focus { outline: 2px solid #6366f1; outline-offset: 2px; }
+    .input-row input::placeholder { color: #475569; }
+    .input-row button {
+      padding: 12px 24px; border-radius: 24px; border: none; background: #6366f1;
+      color: #fff; font-weight: 600; cursor: pointer; font-size: 0.9rem;
+    }
+    .input-row button:hover { background: #818cf8; }
+    .input-row button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .chip {
+      padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(99,102,241,0.15);
+      background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.8rem; font-family: inherit;
+      transition: all 0.2s;
+    }
+    .chip:hover { border-color: #6366f1; color: #818cf8; }
+    .results { margin-top: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .result-card {
+      background: #1e293b; border: 1px solid rgba(99,102,241,0.1); border-radius: 8px; padding: 12px; text-align: center;
+    }
+    .result-card .label { color: #64748b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+    .result-card .value { font-size: 1.1rem; font-weight: 700; color: #818cf8; margin-top: 4px; }
+    footer { text-align: center; padding: 16px; color: #475569; font-size: 0.8rem; }
+    @media (max-width: 600px) {
+      .container { padding: 8px; }
+      .chat-box { height: 300px; }
+      .results { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🏦 OSAM</h1>
+      <p>Voice Banking — IPPB Integration</p>
+    </header>
+
+    <div class="lang-bar" role="radiogroup" aria-label="Language">
+      <button class="lang-btn active" data-lang="hi" onclick="setLang('hi')">हिन्दी</button>
+      <button class="lang-btn" data-lang="ta" onclick="setLang('ta')">தமிழ்</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+    </div>
+
+    <div class="chat-box" id="chatBox">
+      <div class="welcome" id="welcomeMsg">
+        नमस्कार! मैं OSAM हूँ।<br>
+        कहें: "मेरा बैलेंस चेक करें", "लोन के लिए आवेदन करें", या "निकटतम शाखा खोजें"
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="input-row">
+        <input type="text" id="textInput" placeholder="यहाँ टाइप करें..." onkeydown="if(event.key==='Enter') sendText()" />
+        <button id="sendBtn" onclick="sendText()">भेजें</button>
+      </div>
+      <div class="chips">
+        <button class="chip" onclick="quickCmd('balance')">💰 बैलेंस</button>
+        <button class="chip" onclick="quickCmd('loan')">📋 लोन</button>
+        <button class="chip" onclick="quickCmd('branch')">📍 शाखा</button>
+        <button class="chip" onclick="clearChat()">🔄 रीसेट</button>
+      </div>
+    </div>
+
+    <div id="quickResults" class="results"></div>
+  </div>
+
+  <footer>
+    OSAM — RBI Innovation Hub Project &bull; <a href="/api/health" style="color:#6366f1;">API Health</a>
+  </footer>
+
+  <script>
+    const API = 'http://localhost:8002';
+    let lang = 'hi';
+    let sessionId = '';
+    let loading = false;
+
+    const cmdMap = {
+      balance: { hi: 'मेरा बैलेंस चेक करें', ta: 'என் இருப்பைச் சரிபார்', en: 'check my balance' },
+      loan: { hi: 'लोन के लिए आवेदन करें', ta: 'கடனுக்கு விண்ணப்பி', en: 'apply for a loan' },
+      branch: { hi: 'निकटतम शाखा खोजें', ta: 'அருகிலுள்ள கிளையைக் கண்டுபிடி', en: 'find nearest branch' },
+    };
+
+    const inputPlaceholders = { hi: 'यहाँ टाइप करें...', ta: 'இங்கே தட்டச்சு செய்க...', en: 'Type here...' };
+
+    function setLang(l) {
+      lang = l;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
+      document.getElementById('textInput').placeholder = inputPlaceholders[l];
+    }
+
+    function addMsg(text, type) {
+      const box = document.getElementById('chatBox');
+      const welcome = document.getElementById('welcomeMsg');
+      if (welcome) welcome.remove();
+      const div = document.createElement('div');
+      div.className = 'msg ' + type;
+      div.textContent = text;
+      div.setAttribute('lang', lang);
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendText() {
+      const input = document.getElementById('textInput');
+      const text = input.value.trim();
+      if (!text || loading) return;
+      input.value = '';
+      addMsg(text, 'user');
+      await processCmd(text);
+    }
+
+    async function processCmd(text) {
+      setLoading(true);
+      try {
+        const res = await fetch(API + '/api/voice/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, language: lang, session_id: sessionId || undefined })
+        });
+        const data = await res.json();
+        sessionId = data.session_id || '';
+        addMsg(data.response_text, 'system');
+        setLoading(false);
+
+        if (data.intent === 'balance') await handleBalance();
+        else if (data.intent === 'loan') await handleLoan();
+        else if (data.intent === 'branch') await handleBranch();
+      } catch(e) {
+        addMsg('⚠️ Error: ' + e.message, 'system error');
+        setLoading(false);
+      }
+    }
+
+    async function handleBalance() {
+      const acct = prompt(lang === 'hi' ? 'खाता नंबर दर्ज करें (जैसे 123456):' : lang === 'ta' ? 'கணக்கு எண்ணை உள்ளிடவும்:' : 'Enter account number:');
+      if (!acct) return;
+      setLoading(true);
+      try {
+        const res = await fetch(API + '/api/balance', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ account_number: acct, language: lang })
+        });
+        const data = await res.json();
+        addMsg(data.response_text, 'system');
+        showResult('balance', data.balance !== null ? '₹' + data.balance.toLocaleString() : 'Error');
+      } catch(e) { addMsg('⚠️ ' + e.message, 'system error'); }
+      setLoading(false);
+    }
+
+    async function handleLoan() {
+      const purpose = prompt(lang === 'hi' ? 'लोन का उद्देश्य?' : lang === 'ta' ? 'கடனின் நோக்கம்?' : 'Loan purpose?');
+      if (!purpose) return;
+      const amt = prompt(lang === 'hi' ? 'राशि?' : lang === 'ta' ? 'தொகை?' : 'Amount?');
+      if (!amt) return;
+      setLoading(true);
+      try {
+        const res = await fetch(API + '/api/loan/apply', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: parseFloat(amt), purpose, language: lang })
+        });
+        const data = await res.json();
+        addMsg(data.response_text, 'system');
+        showResult('loan', data.application_id);
+      } catch(e) { addMsg('⚠️ ' + e.message, 'system error'); }
+      setLoading(false);
+    }
+
+    async function handleBranch() {
+      const loc = prompt(lang === 'hi' ? 'शहर का नाम?' : lang === 'ta' ? 'நகரத்தின் பெயர்?' : 'City name?');
+      if (!loc) return;
+      setLoading(true);
+      try {
+        const res = await fetch(API + '/api/branch/nearby', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ location: loc, language: lang })
+        });
+        const data = await res.json();
+        addMsg(data.response_text, 'system');
+        if (data.branches && data.branches.length > 0) {
+          showResult('branch', data.branches[0].name + ' (' + data.branches[0].distance + 'km)');
+        }
+      } catch(e) { addMsg('⚠️ ' + e.message, 'system error'); }
+      setLoading(false);
+    }
+
+    function quickCmd(cmd) {
+      const text = cmdMap[cmd][lang] || cmdMap[cmd].en;
+      addMsg(text, 'user');
+      processCmd(text);
+      document.getElementById('quickResults').innerHTML = '';
+    }
+
+    function showResult(type, value) {
+      const labels = { balance: { hi: 'बैलेंस', ta: 'இருப்பு', en: 'Balance' }, loan: { hi: 'लोन ID', ta: 'கடன் ID', en: 'Loan ID' }, branch: { hi: 'शाखा', ta: 'கிளை', en: 'Branch' } };
+      const div = document.getElementById('quickResults');
+      div.innerHTML = '<div class="result-card"><div class="label">' + (labels[type] ? labels[type][lang] || labels[type].en : 'Result') + '</div><div class="value">' + value + '</div></div>';
+    }
+
+    function setLoading(v) { loading = v; document.getElementById('sendBtn').disabled = v; }
+
+    function clearChat() {
+      document.getElementById('chatBox').innerHTML = '<div class="welcome" id="welcomeMsg">' + document.querySelector('.welcome').textContent + '</div>';
+      document.getElementById('quickResults').innerHTML = '';
+      sessionId = '';
+    }
+  </script>
+</body>
+</html>
