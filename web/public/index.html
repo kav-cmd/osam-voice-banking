@@ -205,6 +205,42 @@
     .ivr-key:hover { background: rgba(99,102,241,0.15) !important; border-color: #6366f1 !important; }
     .ivr-key:active { background: rgba(99,102,241,0.25) !important; transform: scale(0.95); }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+    .hc { background: #000 !important; color: #fff !important; }
+    .hc .card, .hc .controls, .hc .chat-box, .hc .tab-bar, .hc .lang-bar { background: #111 !important; border-color: #fff !important; }
+    .hc .tab-btn[aria-selected="true"] { background: #333 !important; color: #fff !important; }
+    .hc .tab-btn { color: #aaa !important; }
+    .hc .msg.system { background: #222 !important; color: #fff !important; border-color: #fff !important; }
+    .hc .msg.user { background: #444 !important; color: #fff !important; }
+    .hc .input-row input, .hc .demo-select, .hc .input-demo { background: #222 !important; color: #fff !important; border-color: #fff !important; }
+    .hc .input-row button, .hc .btn-demo { background: #fff !important; color: #000 !important; }
+    .hc .chip { color: #fff !important; border-color: #fff !important; }
+    .hc a { color: #8cf !important; }
+    .hc .review-table td, .hc .review-table th { border-color: #444 !important; }
+    .hc .form-group input, .hc .form-group select { background: #222 !important; color: #fff !important; border-color: #fff !important; }
+    .hc .step.active .step-num { background: #fff !important; color: #000 !important; }
+    .hc .step.completed .step-num { background: #fff !important; color: #000 !important; }
+    .hc .badge-green { background: #fff !important; color: #000 !important; }
+    .hc header h1 { background: none !important; -webkit-text-fill-color: #fff !important; color: #fff !important; }
+
+    .acc-btn { padding: 4px 10px; border-radius: 14px; border: 1px solid rgba(99,102,241,0.12); background: rgba(30,41,59,0.5); color: #94a3b8; cursor: pointer; font-size: 0.7rem; transition: all .2s; }
+    .acc-btn:hover { border-color: #6366f1; color: #c7d2fe; }
+    .acc-btn.active { background: rgba(99,102,241,0.2); color: #a5b4fc; border-color: #6366f1; }
+    .font-lg { font-size: 120% !important; }
+    .font-xl { font-size: 140% !important; }
+
+    .mic-btn { padding: 11px 14px; border-radius: 24px; border: 1px solid rgba(99,102,241,0.12); background: rgba(15,23,42,0.8); color: #94a3b8; cursor: pointer; font-size: 1rem; transition: all .2s; }
+    .mic-btn:hover { border-color: #6366f1; color: #c7d2fe; }
+    .mic-btn.listening { background: rgba(239,68,68,0.2); border-color: #ef4444; color: #fca5a5; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); } }
+
+    .one-click-overlay { display: none; padding: 24px; text-align: center; }
+    .one-click-overlay.show { display: block; }
+    .one-click-overlay .big-btn { display: block; width: 100%; max-width: 320px; margin: 10px auto; padding: 20px; border-radius: 16px; border: 1px solid rgba(99,102,241,0.15); background: rgba(30,41,59,0.6); color: #e2e8f0; font-size: 1.2rem; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .one-click-overlay .big-btn:hover { border-color: #6366f1; background: rgba(99,102,241,0.1); }
+    .hc .one-click-overlay .big-btn { background: #222 !important; border-color: #fff !important; color: #fff !important; }
+    .hc .one-click-overlay .big-btn:hover { background: #333 !important; }
+
     @media (max-width: 600px) {
       .container { padding: 8px; }
       .tab-btn { font-size: 0.7rem; padding: 8px 4px; }
@@ -225,10 +261,15 @@
       <p>वॉइस बैंकिंग — IPPB एकीकरण</p>
     </header>
 
-    <div class="lang-bar" role="radiogroup" aria-label="Language">
+    <div class="lang-bar" role="radiogroup" aria-label="Language" style="margin-bottom:4px;">
       <button class="lang-btn active" data-lang="hi" onclick="setLang('hi')">हिन्दी</button>
       <button class="lang-btn" data-lang="ta" onclick="setLang('ta')">தமிழ்</button>
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+    </div>
+    <div style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;">
+      <button class="acc-btn" id="hcToggle" onclick="toggleHC()" aria-pressed="false" title="High Contrast Mode">☀️ High Contrast</button>
+      <button class="acc-btn" id="fontToggle" onclick="cycleFont()" title="Increase font size">A</button>
+      <button class="acc-btn" id="oneClickToggle" onclick="toggleOneClick()" title="One-click simplified mode">🔘 One-Click</button>
     </div>
 
     <nav aria-label="Main sections"><div class="tab-bar" role="tablist">
@@ -245,6 +286,7 @@
       <div class="controls">
         <div class="input-row">
           <input type="text" id="textInput" placeholder="यहाँ टाइप करें..." onkeydown="if(event.key==='Enter') sendText()" />
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()" aria-label="Voice input" title="Voice input">🎤</button>
           <button id="sendBtn" onclick="sendText()">भेजें</button>
         </div>
         <div class="chips">
@@ -279,6 +321,12 @@
       <div style="display:flex;gap:6px;justify-content:center;margin-top:4px;">
         <button class="chip" id="ivrToggleBtn" onclick="toggleIvrMode()">📞 Phone Mode</button>
         <button class="chip" id="playLastBtn" onclick="playLastAudio()" style="display:none;">🔊 Play Audio</button>
+      </div>
+      <div class="one-click-overlay" id="oneClickOverlay">
+        <button class="big-btn" onclick="quickCmd('balance');toggleOneClick()">💰 Check Balance</button>
+        <button class="big-btn" onclick="quickCmd('loan');toggleOneClick()">📋 Apply for Loan</button>
+        <button class="big-btn" onclick="quickCmd('branch');toggleOneClick()">📍 Find Branch</button>
+        <button class="big-btn" onclick="toggleOneClick()">✕ Exit One-Click</button>
       </div>
     </div>
 
@@ -1187,6 +1235,117 @@
           ivrKey(e.key);
         }
       }
+    });
+
+    let hcOn = false, fontSizeLevel = 0, oneClickOn = false, recognition = null, micListening = false;
+
+    function toggleHC() {
+      hcOn = !hcOn;
+      document.documentElement.classList.toggle('hc', hcOn);
+      document.getElementById('hcToggle').setAttribute('aria-pressed', hcOn);
+      announce(hcOn ? 'High contrast mode on' : 'High contrast mode off');
+    }
+
+    function cycleFont() {
+      const sizes = ['', 'font-lg', 'font-xl'];
+      const labels = ['Normal size', 'Large size', 'Extra large size'];
+      fontSizeLevel = (fontSizeLevel + 1) % 3;
+      document.documentElement.classList.remove('font-lg', 'font-xl');
+      if (sizes[fontSizeLevel]) document.documentElement.classList.add(sizes[fontSizeLevel]);
+      announce(labels[fontSizeLevel]);
+    }
+
+    function toggleOneClick() {
+      oneClickOn = !oneClickOn;
+      document.getElementById('oneClickOverlay').classList.toggle('show', oneClickOn);
+      document.getElementById('oneClickToggle').classList.toggle('active', oneClickOn);
+      document.querySelector('.controls').style.display = oneClickOn ? 'none' : '';
+      document.getElementById('quickResults').style.display = oneClickOn ? 'none' : '';
+      if (oneClickOn) document.getElementById('ivrBar').style.display = 'none';
+      if (!oneClickOn) document.getElementById('ivrToggleBtn').style.display = '';
+      announce(oneClickOn ? 'One click mode on' : 'One click mode off');
+    }
+
+    function toggleMic() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        addMsg('Voice input not supported in this browser. Try Chrome.', 'system error');
+        return;
+      }
+      if (micListening) { stopMic(); return; }
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SR();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = lang === 'hi' ? 'hi-IN' : lang === 'ta' ? 'ta-IN' : 'en-IN';
+      recognition.onresult = function(e) {
+        const text = e.results[0][0].transcript;
+        document.getElementById('textInput').value = text;
+        stopMic();
+        sendText();
+      };
+      recognition.onerror = function(e) { addMsg('🎤 Voice error: ' + e.error, 'system error'); stopMic(); };
+      recognition.onend = function() { stopMic(); };
+      recognition.start();
+      micListening = true;
+      document.getElementById('micBtn').classList.add('listening');
+      document.getElementById('micBtn').textContent = '🔴';
+    }
+
+    function stopMic() {
+      micListening = false;
+      if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+      document.getElementById('micBtn').classList.remove('listening');
+      document.getElementById('micBtn').textContent = '🎤';
+    }
+
+    function playClick() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator(), gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 800; osc.type = 'sine';
+        gain.gain.value = 0.1;
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08);
+        osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.08);
+      } catch(e) {}
+    }
+
+    function announceStep(msg) {
+      const el = document.getElementById('loanFormContainer');
+      if (el) el.setAttribute('aria-label', 'Current step: ' + msg);
+    }
+
+    (function() {
+      const orig = window.renderLoanStep;
+      if (orig) {
+        window.renderLoanStep = function() {
+          orig();
+          const labels = ['Personal Details','Income','Loan Amount','Documents','Verification','Review & Submit'];
+          if (window.loanStep >= 0 && window.loanStep < labels.length) announceStep(labels[window.loanStep]);
+        };
+      }
+    })();
+
+    document.addEventListener('keydown', function(e) {
+      if (e.target && (e.target.id === 'otpInput' || e.target.id === 'panConfirmInput') && e.key >= '0' && e.key <= '9') {
+        playClick();
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.altKey) {
+        const tabMap = { '1':'chat', '2':'components', '3':'loan', '4':'compliance' };
+        if (tabMap[e.key]) { e.preventDefault(); switchTab(tabMap[e.key]); document.getElementById('tab-btn-' + tabMap[e.key]).focus(); }
+        if (e.key === 'm') { e.preventDefault(); toggleIvrMode(); }
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); sendText(); }
+    });
+
+    window.addEventListener('load', function() {
+      if (document.getElementById('srAnnouncer')) announce('OSAM Voice Banking loaded. Alt 1 Chat, Alt 2 Components, Alt 3 Loan, Alt 4 Compliance, Alt M phone mode.');
     });
 
     loadBankData();
