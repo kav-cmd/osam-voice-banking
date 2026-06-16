@@ -12,23 +12,23 @@ MOCK_BALANCES = {
 
 MOCK_BRANCHES = {
     "delhi": [
-        {"name": "IPPB दिल्ली मुख्य शाखा", "address": "स्पीड पोस्ट सेंटर, मार्केट रोड, नई दिल्ली", "distance": 1.2, "timings": "सुबह 9 बजे से शाम 5 बजे तक"},
-        {"name": "IPPB करोल बाग शाखा", "address": "करोल बाग, नई दिल्ली", "distance": 3.5, "timings": "सुबह 9 बजे से शाम 5 बजे तक"},
+        {"name": {"hi": "IPPB दिल्ली मुख्य शाखा", "ta": "IPPB டெல்லி முதன்மை கிளை", "en": "IPPB Delhi Main Branch"}, "address": {"hi": "स्पीड पोस्ट सेंटर, मार्केट रोड, नई दिल्ली", "ta": "ஸ்பீட் போஸ்ட் சென்டர், மார்க்கெட் ரோடு, புது டெல்லி", "en": "Speed Post Centre, Market Road, New Delhi"}, "distance": 1.2, "timings": {"hi": "सुबह 9 बजे से शाम 5 बजे तक", "ta": "காலை 9 மணி முதல் மாலை 5 மணி வரை", "en": "9 AM to 5 PM"}},
+        {"name": {"hi": "IPPB करोल बाग शाखा", "ta": "IPPB கரோல் பாக் கிளை", "en": "IPPB Karol Bagh Branch"}, "address": {"hi": "करोल बाग, नई दिल्ली", "ta": "கரோல் பாக், புது டெல்லி", "en": "Karol Bagh, New Delhi"}, "distance": 3.5, "timings": {"hi": "सुबह 9 बजे से शाम 5 बजे तक", "ta": "காலை 9 மணி முதல் மாலை 5 மணி வரை", "en": "9 AM to 5 PM"}},
     ],
     "mumbai": [
-        {"name": "IPPB मुंबई मुख्य शाखा", "address": "जीपीओ, मुंबई", "distance": 0.8, "timings": "सुबह 9.30 बजे से शाम 4.30 बजे तक"},
+        {"name": {"hi": "IPPB मुंबई मुख्य शाखा", "ta": "IPPB மும்பை முதன்மை கிளை", "en": "IPPB Mumbai Main Branch"}, "address": {"hi": "जीपीओ, मुंबई", "ta": "ஜிபிஓ, மும்பை", "en": "GPO, Mumbai"}, "distance": 0.8, "timings": {"hi": "सुबह 9.30 बजे से शाम 4.30 बजे तक", "ta": "காலை 9.30 மணி முதல் மாலை 4.30 மணி வரை", "en": "9:30 AM to 4:30 PM"}},
     ],
     "chennai": [
-        {"name": "IPPB चेन्नई शाखा", "address": "अन्ना सालाई, चेन्नई", "distance": 2.1, "timings": "सुबह 9 बजे से शाम 5 बजे तक"},
+        {"name": {"hi": "IPPB चेन्नई शाखा", "ta": "IPPB சென்னை கிளை", "en": "IPPB Chennai Branch"}, "address": {"hi": "अन्ना सालाई, चेन्नई", "ta": "அண்ணா சாலை, சென்னை", "en": "Anna Salai, Chennai"}, "distance": 2.1, "timings": {"hi": "सुबह 9 बजे से शाम 5 बजे तक", "ta": "காலை 9 மணி முதல் மாலை 5 மணி வரை", "en": "9 AM to 5 PM"}},
     ],
     "kolkata": [
-        {"name": "IPPB कोलकाता शाखा", "address": "कोलकाता जीपीओ, पश्चिम बंगाल", "distance": 1.5, "timings": "सुबह 9 बजे से शाम 4 बजे तक"},
+        {"name": {"hi": "IPPB कोलकाता शाखा", "ta": "IPPB கொல்கத்தா கிளை", "en": "IPPB Kolkata Branch"}, "address": {"hi": "कोलकाता जीपीओ, पश्चिम बंगाल", "ta": "கொல்கத்தா ஜிபிஓ, மேற்கு வங்காளம்", "en": "Kolkata GPO, West Bengal"}, "distance": 1.5, "timings": {"hi": "सुबह 9 बजे से शाम 4 बजे तक", "ta": "காலை 9 மணி முதல் மாலை 4 மணி வரை", "en": "9 AM to 4 PM"}},
     ],
     "bangalore": [
-        {"name": "IPPB बेंगलुरु शाखा", "address": "महात्मा गांधी रोड, बेंगलुरु", "distance": 1.8, "timings": "सुबह 9.30 बजे से शाम 4.30 बजे तक"},
+        {"name": {"hi": "IPPB बेंगलुरु शाखा", "ta": "IPPB பெங்களூரு கிளை", "en": "IPPB Bangalore Branch"}, "address": {"hi": "महात्मा गांधी रोड, बेंगलुरु", "ta": "மகாத்மா காந்தி சாலை, பெங்களூரு", "en": "MG Road, Bangalore"}, "distance": 1.8, "timings": {"hi": "सुबह 9.30 बजे से शाम 4.30 बजे तक", "ta": "காலை 9.30 மணி முதல் மாலை 4.30 மணி வரை", "en": "9:30 AM to 4:30 PM"}},
     ],
     "lucknow": [
-        {"name": "IPPB लखनऊ शाखा", "address": "डाक भवन, लखनऊ", "distance": 0.5, "timings": "सुबह 9 बजे से शाम 5 बजे तक"},
+        {"name": {"hi": "IPPB लखनऊ शाखा", "ta": "IPPB லக்னோ கிளை", "en": "IPPB Lucknow Branch"}, "address": {"hi": "डाक भवन, लखनऊ", "ta": "அஞ்சல் பவன், லக்னோ", "en": "Dak Bhawan, Lucknow"}, "distance": 0.5, "timings": {"hi": "सुबह 9 बजे से शाम 5 बजे तक", "ta": "காலை 9 மணி முதல் மாலை 5 மணி வரை", "en": "9 AM to 5 PM"}},
     ],
 }
 
@@ -100,6 +100,14 @@ def get_nearby_branches(location: str, lang: str = "en") -> list[dict]:
                     break
 
     if city_key and city_key in MOCK_BRANCHES:
-        return MOCK_BRANCHES[city_key]
+        results = []
+        for b in MOCK_BRANCHES[city_key]:
+            results.append({
+                "name": b["name"].get(lang, b["name"].get("en", "")),
+                "address": b["address"].get(lang, b["address"].get("en", "")),
+                "distance": b["distance"],
+                "timings": b["timings"].get(lang, b["timings"].get("en", "")),
+            })
+        return results
 
     return []
