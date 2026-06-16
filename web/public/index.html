@@ -95,12 +95,17 @@
     legend { font-size: 0.8rem; color: #a5b4fc; font-weight: 600; padding: 0 6px; }
     .demo-label { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #cbd5e1; cursor: pointer; padding: 4px 0; }
     .demo-label input { accent-color: #818cf8; }
-    .alert { padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+    .alert { padding: 12px 16px; border-radius: 10px; font-size: 0.85rem; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; line-height: 1.5; }
+    .alert::before { font-size: 1rem; flex-shrink: 0; display: inline-block; line-height: 1.5; }
     .alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.2); color: #fca5a5; }
+    .alert-error::before { content: "\2715"; }
     .alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: #86efac; }
+    .alert-success::before { content: "\2713"; }
     .alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: #fbbf24; }
+    .alert-warning::before { content: "\26A0"; }
     .alert-info { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #93c5fd; }
-    .alert-dismiss { margin-left: auto; background: none; border: none; color: inherit; cursor: pointer; font-size: 1.1rem; opacity: 0.6; padding: 0 2px; }
+    .alert-info::before { content: "\2139"; }
+    .alert-dismiss { margin-left: auto; background: none; border: none; color: inherit; cursor: pointer; font-size: 1.1rem; opacity: 0.6; padding: 0 2px; line-height: 1.5; }
     .alert-dismiss:hover { opacity: 1; }
     .spinner { width: 32px; height: 32px; border: 3px solid rgba(99,102,241,0.1); border-top-color: #818cf8; border-radius: 50%; animation: spin .7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -370,10 +375,10 @@
         <div class="comp-card">
           <h3>Alerts <span class="comp-badge">4.5:1</span></h3>
           <div class="comp-demo" style="flex-direction:column;">
-            <div class="alert alert-error" role="alert"><span aria-hidden="true">✕</span> Invalid account number. Please enter 6 digits. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss error">×</button></div>
-            <div class="alert alert-success" role="status"><span aria-hidden="true">✓</span> Your balance has been updated successfully. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss success">×</button></div>
-            <div class="alert alert-warning"><span aria-hidden="true">⚠</span> Your session will expire in 2 minutes. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss warning">×</button></div>
-            <div class="alert alert-info"><span aria-hidden="true">ℹ</span> New IPPB feature: UPI payments now available. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss info">×</button></div>
+            <div class="alert alert-error" role="alert">Invalid account number. Please enter 6 digits. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss error">×</button></div>
+            <div class="alert alert-success" role="status">Your balance has been updated successfully. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss success">×</button></div>
+            <div class="alert alert-warning">Your session will expire in 2 minutes. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss warning">×</button></div>
+            <div class="alert alert-info">New IPPB feature: UPI payments now available. <button class="alert-dismiss" onclick="this.parentElement.remove()" aria-label="Dismiss info">×</button></div>
           </div>
           <div class="comp-info">
             <span>role="alert" on error</span>
@@ -469,7 +474,8 @@
         <div class="step" id="ls2"><span class="step-num">2</span> Income</div>
         <div class="step" id="ls3"><span class="step-num">3</span> Amount</div>
         <div class="step" id="ls4"><span class="step-num">4</span> Docs</div>
-        <div class="step" id="ls5"><span class="step-num">5</span> Review</div>
+        <div class="step" id="ls5"><span class="step-num">5</span> Verify</div>
+        <div class="step" id="ls6"><span class="step-num">6</span> Review</div>
       </div>
 
       <div id="loanFormContainer" class="loan-form card" aria-live="polite">
@@ -779,11 +785,11 @@
 
     function renderLoanStep() {
       const steps = [
-        renderPersonalStep, renderIncomeStep, renderAmountStep, renderDocsStep, renderReviewStep
+        renderPersonalStep, renderIncomeStep, renderAmountStep, renderDocsStep, renderVerifyStep, renderReviewStep
       ];
       if (loanStep < 0) loanStep = 0;
       if (loanStep >= steps.length) loanStep = steps.length - 1;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         const el = document.getElementById('ls' + (i + 1));
         if (!el) continue;
         el.className = 'step';
@@ -813,7 +819,7 @@
 
     function renderPersonalStep() {
       const v = loanData.personal || {};
-      return '<h2 class="card-title">' + l('personal') + '</h2><p class="card-subtitle">Step 1 of 5</p>' +
+      return '<h2 class="card-title">' + l('personal') + '</h2><p class="card-subtitle">Step 1 of 6</p>' +
         '<div class="form-group"><label for="loanName">' + l('name') + '</label><input type="text" id="loanName" value="' + (v.name || '') + '" placeholder="Rajesh Kumar" aria-describedby="errName" /><div id="errName" class="form-error"></div></div>' +
         '<div class="form-row"><div class="form-group"><label for="loanDob">' + l('dob') + '</label><input type="date" id="loanDob" value="' + (v.dob || '') + '" aria-describedby="errDob" /><div id="errDob" class="form-error"></div></div>' +
         '<div class="form-group"><label for="loanPan">' + l('pan') + '</label><input type="text" id="loanPan" value="' + (v.pan || '') + '" placeholder="ABCDE1234F" aria-describedby="errPan" /><div id="errPan" class="form-error"></div></div></div>' +
@@ -824,7 +830,7 @@
 
     function renderIncomeStep() {
       const v = loanData.income || {};
-      return '<h2 class="card-title">' + l('income') + '</h2><p class="card-subtitle">Step 2 of 5</p>' +
+      return '<h2 class="card-title">' + l('income') + '</h2><p class="card-subtitle">Step 2 of 6</p>' +
         '<div class="form-group"><label for="loanEmp">Employment Type</label><select id="loanEmp" onchange="renderIncomeStep()"><option value="salaried" ' + (v.emp === 'salaried' || !v.emp ? 'selected' : '') + '>Salaried</option><option value="self" ' + (v.emp === 'self' ? 'selected' : '') + '>Self-Employed</option><option value="business" ' + (v.emp === 'business' ? 'selected' : '') + '>Business</option></select></div>' +
         '<div class="form-group"><label for="loanIncome">Monthly Income (₹)</label><input type="number" id="loanIncome" min="5000" max="500000" step="1000" value="' + (v.income || '50000') + '" /></div>' +
         '<div class="form-group"><label for="loanCompany">' + (document.getElementById('loanEmp') && document.getElementById('loanEmp').value === 'salaried' ? 'Company Name' : 'Business Name') + '</label><input type="text" id="loanCompany" value="' + (v.company || '') + '" placeholder="ABC Corp" /></div>' +
@@ -852,7 +858,7 @@
       const existingEmi = loanData.income ? loanData.income.existingEmi : 0;
       const totalEmi = emi + existingEmi;
       const eligible = totalEmi <= income * 0.5;
-      return '<h2 class="card-title">' + l('amount') + '</h2><p class="card-subtitle">Step 3 of 5 — EMI Calculator</p>' +
+      return '<h2 class="card-title">' + l('amount') + '</h2><p class="card-subtitle">Step 3 of 6 — EMI Calculator</p>' +
         '<div class="form-group"><label for="loanAmt">Loan Amount: ₹' + amt.toLocaleString() + '</label><input type="range" id="loanAmt" min="10000" max="5000000" step="10000" value="' + amt + '" oninput="renderAmountStep()" /></div>' +
         '<div class="form-group"><label for="loanTenure">Tenure: ' + tenure + ' months (' + (tenure/12).toFixed(1) + ' years)</label><input type="range" id="loanTenure" min="6" max="60" step="1" value="' + tenure + '" oninput="renderAmountStep()" /></div>' +
         '<div class="emi-display"><div class="amount">₹' + Math.round(emi).toLocaleString() + '</div><div class="sub">Monthly EMI at ' + rate + '% p.a.</div>' +
@@ -864,21 +870,141 @@
     }
 
     function renderDocsStep() {
-      return '<h2 class="card-title">' + l('docs') + '</h2><p class="card-subtitle">Step 4 of 5</p>' +
-        '<div class="doc-upload"><label for="docPan">📄 PAN Card</label><input type="file" id="docPan" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
-        '<div class="doc-upload"><label for="docAadhaar">📄 Aadhaar Card</label><input type="file" id="docAadhaar" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
-        '<div class="doc-upload"><label for="docStatement">📄 Bank Statement (3 months)</label><input type="file" id="docStatement" accept=".pdf" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
+      const docs = loanData.docs || {};
+      const needed = ['docPan','docAadhaar','docStatement'];
+      const missing = needed.filter(k => !docs[k]);
+      const allDone = missing.length === 0;
+      const labels = { docPan:'PAN Card', docAadhaar:'Aadhaar Card', docStatement:'Bank Statement' };
+      const msgHtml = allDone
+        ? '<div id="docMsg" style="font-size:0.75rem;color:#86efac;margin-top:4px;">✓ All documents uploaded</div>'
+        : '<div id="docMsg" style="font-size:0.75rem;color:#fbbf24;margin-top:4px;">⏳ Please upload: ' + missing.map(k => labels[k] || k).join(', ') + '</div>';
+      return '<h2 class="card-title">' + l('docs') + '</h2><p class="card-subtitle">Step 4 of 6</p>' +
+        '<div class="doc-upload"><label for="docPan">📄 PAN Card</label><input type="file" id="docPan" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this,\'docPan\')" /><span class="doc-status">' + (docs.docPan ? '✓ Uploaded' : '') + '</span></div>' +
+        '<div class="doc-upload"><label for="docAadhaar">📄 Aadhaar Card</label><input type="file" id="docAadhaar" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this,\'docAadhaar\')" /><span class="doc-status">' + (docs.docAadhaar ? '✓ Uploaded' : '') + '</span></div>' +
+        '<div class="doc-upload"><label for="docStatement">📄 Bank Statement (3 months)</label><input type="file" id="docStatement" accept=".pdf" onchange="showDocStatus(this,\'docStatement\')" /><span class="doc-status">' + (docs.docStatement ? '✓ Uploaded' : '') + '</span></div>' +
+        msgHtml +
         '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 3: Loan Amount">' + l('back') + '</button>' +
-        '<button class="btn-continue" onclick="loanStep++;renderLoanStep()" aria-label="Continue to step 5: Review">' + l('continue') + '</button></div>';
+        '<button class="btn-continue" id="docContinueBtn" onclick="if(validateDocs()){loanStep++;renderLoanStep()}" ' + (allDone ? '' : 'disabled') + ' aria-label="Continue to step 5">' + l('continue') + '</button></div>';
     }
 
-    function showDocStatus(input) {
+    function showDocStatus(input, key) {
       const status = input.parentElement.querySelector('.doc-status');
       if (input.files && input.files[0]) {
         const f = input.files[0];
         status.textContent = '✓ ' + f.name + ' (' + (f.size / 1024).toFixed(1) + ' KB)';
+        if (!loanData.docs) loanData.docs = {};
+        loanData.docs[key] = { name: f.name, size: f.size, type: f.type };
       } else {
         status.textContent = '';
+        if (loanData.docs) delete loanData.docs[key];
+      }
+      checkDocsReady();
+    }
+
+    function checkDocsReady() {
+      const btn = document.getElementById('docContinueBtn');
+      const msg = document.getElementById('docMsg');
+      const docs = loanData.docs || {};
+      const needed = ['docPan','docAadhaar','docStatement'];
+      const missing = needed.filter(k => !docs[k]);
+      if (missing.length === 0) {
+        btn.disabled = false;
+        msg.textContent = '✓ All documents uploaded';
+        msg.style.color = '#86efac';
+      } else {
+        btn.disabled = true;
+        const labels = { docPan:'PAN Card', docAadhaar:'Aadhaar Card', docStatement:'Bank Statement' };
+        msg.textContent = '⏳ Please upload: ' + missing.map(k => labels[k] || k).join(', ');
+        msg.style.color = '#fbbf24';
+      }
+    }
+
+    function validateDocs() {
+      const docs = loanData.docs || {};
+      const needed = ['docPan','docAadhaar','docStatement'];
+      const missing = needed.filter(k => !docs[k]);
+      if (missing.length > 0) {
+        document.getElementById('docMsg').textContent = '❌ Please upload all required documents';
+        document.getElementById('docMsg').style.color = '#fca5a5';
+        return false;
+      }
+      return true;
+    }
+
+    let otpCode = '', otpVerified = false, panVerified = false;
+
+    function renderVerifyStep() {
+      const p = loanData.personal || {};
+      const phone = p.phone || '';
+      const pan = p.pan || '';
+      const maskedPhone = phone.length >= 4 ? 'XXXXXX' + phone.slice(-4) : 'XXXXXXXXXX';
+      const maskedPan = pan.length >= 4 ? 'XXXXX' + pan.slice(-4) : 'XXXXXXXXXX';
+      const otpOk = otpVerified;
+      const panOk = panVerified;
+      return '<h2 class="card-title">🔐 2-Step Verification</h2><p class="card-subtitle">Step 5 of 6 — Verify your identity</p>' +
+        '<div style="margin-bottom:16px;border:1px solid rgba(99,102,241,0.1);border-radius:12px;padding:16px;' + (otpOk ? 'background:rgba(34,197,94,0.05);' : '') + '">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+        '<span class="badge ' + (otpOk ? 'badge-green' : 'badge') + '" style="min-width:24px;text-align:center;">' + (otpOk ? '✓' : '1') + '</span>' +
+        '<strong style="color:#c7d2fe;font-size:0.9rem;">Enter OTP sent to +91 ' + maskedPhone + '</strong></div>' +
+        (otpOk ? '<p style="color:#86efac;font-size:0.8rem;">✓ OTP verified</p>' :
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<input type="text" id="otpInput" maxlength="6" placeholder="Enter 6-digit OTP" style="flex:1;min-width:140px;padding:9px 14px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-family:inherit;font-size:0.85rem;" />' +
+          '<button class="btn-demo btn-primary btn-sm" onclick="sendOTP()" id="sendOtpBtn" aria-label="Send OTP to phone">Send OTP</button>' +
+          '<button class="btn-demo btn-primary btn-sm" onclick="verifyOTP()" id="verifyOtpBtn" disabled aria-label="Verify OTP">Verify</button>' +
+          '<div id="otpMsg" style="font-size:0.75rem;color:#fbbf24;margin-top:4px;width:100%;"></div></div>') +
+        '</div>' +
+        '<div style="margin-bottom:16px;border:1px solid rgba(99,102,241,0.1);border-radius:12px;padding:16px;' + (panOk ? 'background:rgba(34,197,94,0.05);' : '') + '">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+        '<span class="badge ' + (panOk ? 'badge-green' : 'badge') + '" style="min-width:24px;text-align:center;">' + (panOk ? '✓' : '2') + '</span>' +
+        '<strong style="color:#c7d2fe;font-size:0.9rem;">Confirm PAN: ' + maskedPan + '</strong></div>' +
+        (panOk ? '<p style="color:#86efac;font-size:0.8rem;">✓ PAN confirmed</p>' :
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<input type="text" id="panConfirmInput" maxlength="4" placeholder="Enter last 4 digits" style="flex:1;min-width:140px;padding:9px 14px;border-radius:8px;border:1px solid rgba(99,102,241,0.12);background:rgba(15,23,42,0.8);color:#f1f5f9;font-family:inherit;font-size:0.85rem;" />' +
+          '<button class="btn-demo btn-primary btn-sm" onclick="confirmPAN()" id="panConfirmBtn" aria-label="Confirm PAN last 4 digits">Confirm</button>' +
+          '<div id="panMsg" style="font-size:0.75rem;color:#fbbf24;margin-top:4px;width:100%;"></div></div>') +
+        '</div>' +
+        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 4: Documents">' + l('back') + '</button>' +
+        '<button class="btn-continue" id="verifyContinueBtn" onclick="if(otpVerified&&panVerified){loanStep++;renderLoanStep()}" ' + (otpVerified && panVerified ? '' : 'disabled') + ' aria-label="Continue to step 6: Review">' + l('continue') + '</button></div>';
+    }
+
+    function sendOTP() {
+      otpCode = String(Math.floor(100000 + Math.random() * 900000));
+      document.getElementById('sendOtpBtn').textContent = 'OTP Sent!';
+      document.getElementById('sendOtpBtn').disabled = true;
+      document.getElementById('otpMsg').textContent = '✓ OTP sent to your phone';
+      document.getElementById('otpMsg').style.color = '#86efac';
+      document.getElementById('verifyOtpBtn').disabled = false;
+    }
+
+    function verifyOTP() {
+      const input = document.getElementById('otpInput').value.trim();
+      const msg = document.getElementById('otpMsg');
+      if (input === otpCode) {
+        otpVerified = true;
+        msg.textContent = '✓ OTP verified successfully!';
+        msg.style.color = '#86efac';
+        renderVerifyStep();
+      } else {
+        msg.textContent = '✕ Invalid OTP. Please try again.';
+        msg.style.color = '#fca5a5';
+        document.getElementById('otpInput').value = '';
+        document.getElementById('verifyOtpBtn').disabled = true;
+      }
+    }
+
+    function confirmPAN() {
+      const input = document.getElementById('panConfirmInput').value.trim().toUpperCase();
+      const pan = (loanData.personal.pan || '').toUpperCase();
+      const msg = document.getElementById('panMsg');
+      if (input === pan.slice(-4)) {
+        panVerified = true;
+        msg.textContent = '✓ PAN confirmed!';
+        msg.style.color = '#86efac';
+        renderVerifyStep();
+      } else {
+        msg.textContent = '✕ Last 4 digits do not match. Try again.';
+        msg.style.color = '#fca5a5';
+        document.getElementById('panConfirmInput').value = '';
       }
     }
 
@@ -886,10 +1012,10 @@
       const p = loanData.personal || {};
       const i = loanData.income || {};
       const a = loanData.amount || {};
-      return '<h2 class="card-title">' + l('review') + '</h2><p class="card-subtitle">Step 5 of 5 — Review your application</p>' +
+      return '<h2 class="card-title">' + l('review') + '</h2><p class="card-subtitle">Step 6 of 6 — Review &amp; Submit</p>' +
         '<table class="review-table"><tr><th scope="row">' + l('name') + '</th><td>' + (p.name || '-') + '</td></tr><tr><th scope="row">' + l('dob') + '</th><td>' + (p.dob || '-') + '</td></tr><tr><th scope="row">' + l('pan') + '</th><td>' + (p.pan || '-') + '</td></tr><tr><th scope="row">' + l('phone') + '</th><td>' + (p.phone || '-') + '</td></tr><tr><th scope="row">' + l('email') + '</th><td>' + (p.email || '-') + '</td></tr><tr><th scope="row">Income</th><td>₹' + (i.income || 0).toLocaleString() + '/mo</td></tr><tr><th scope="row">Loan</th><td>₹' + (a.amount || 0).toLocaleString() + '</td></tr><tr><th scope="row">Tenure</th><td>' + (a.tenure || 0) + ' months</td></tr><tr><th scope="row">EMI</th><td>₹' + Math.round(calcEMI(a.amount || 0, 10.5, a.tenure || 36)).toLocaleString() + '/mo</td></tr></table>' +
         '<div class="form-group" style="margin-top:12px;"><label class="demo-label"><input type="checkbox" id="loanConfirm" /> ' + l('confirming') + '</label></div>' +
-        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 4: Documents">' + l('back') + '</button>' +
+        '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 5: Verification">' + l('back') + '</button>' +
         '<button class="btn-continue" id="loanSubmitBtn" onclick="submitLoan()" disabled aria-label="Submit loan application">' + l('submit') + '</button></div>';
     }
 
@@ -911,9 +1037,9 @@
         });
         const data = await res.json();
         const c = document.getElementById('loanFormContainer');
-        c.innerHTML = '<div class="success-screen"><div class="icon">🎉</div><h2>Application Submitted!</h2><p>Your loan application ID is</p><p class="app-id">' + data.application_id + '</p><p style="margin-top:12px;">We will contact you within 48 hours.</p><button class="btn-demo btn-primary btn-md" style="margin-top:16px;" onclick="loanStep=0;loanData={};renderLoanStep()">Apply Again</button></div>';
+        c.innerHTML = '<div class="success-screen"><div class="icon">🎉</div><h2>Application Submitted!</h2><p>Your loan application ID is</p><p class="app-id">' + data.application_id + '</p><p style="margin-top:12px;">We will contact you within 48 hours.</p><button class="btn-demo btn-primary btn-md" style="margin-top:16px;" onclick="loanStep=0;loanData={};otpVerified=false;panVerified=false;otpCode='';renderLoanStep()">Apply Again</button></div>';
         document.querySelectorAll('#loanStepper .step').forEach(s => s.className = 'step completed');
-        const lbl = document.getElementById('ls5');
+        const lbl = document.getElementById('ls6');
         if (lbl) { lbl.className = 'step completed'; lbl.querySelector('.step-num').textContent = '✓'; }
       } catch(e) {
         alert('Error: ' + e.message);
