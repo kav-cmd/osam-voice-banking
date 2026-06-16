@@ -182,9 +182,9 @@
     .doc-upload input[type="file"]::file-selector-button { padding: 5px 12px; border-radius: 6px; border: 1px solid rgba(99,102,241,0.15); background: rgba(99,102,241,0.08); color: #818cf8; cursor: pointer; font-size: 0.7rem; font-weight: 600; }
     .doc-upload .doc-status { font-size: 0.7rem; color: #22c55e; }
     .review-table { width: 100%; font-size: 0.82rem; }
-    .review-table td { padding: 8px 12px; border-bottom: 1px solid rgba(99,102,241,0.04); }
-    .review-table td:first-child { color: #64748b; font-weight: 600; width: 120px; }
-    .review-table td:last-child { color: #e2e8f0; }
+    .review-table td, .review-table th { padding: 8px 12px; border-bottom: 1px solid rgba(99,102,241,0.04); }
+    .review-table th { color: #64748b; font-weight: 600; width: 120px; text-align: left; }
+    .review-table td { color: #e2e8f0; }
     .success-screen { text-align: center; padding: 32px 16px; }
     .success-screen .icon { font-size: 3rem; margin-bottom: 12px; }
     .success-screen h2 { font-size: 1.2rem; color: #22c55e; margin-bottom: 8px; }
@@ -214,7 +214,7 @@
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <div class="container" id="main-content">
+  <main class="container" id="main-content">
     <header>
       <h1>OSAM</h1>
       <p>वॉइस बैंकिंग — IPPB एकीकरण</p>
@@ -226,12 +226,12 @@
       <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
     </div>
 
-    <div class="tab-bar" role="tablist" aria-label="Main sections">
+    <nav aria-label="Main sections"><div class="tab-bar" role="tablist">
       <button class="tab-btn" role="tab" aria-selected="true" aria-controls="tab-chat" id="tab-btn-chat" onclick="switchTab('chat')">💬 Chat</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-components" id="tab-btn-components" onclick="switchTab('components')">🧩 Components</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-loan" id="tab-btn-loan" onclick="switchTab('loan')">📋 Loan</button>
       <button class="tab-btn" role="tab" aria-selected="false" aria-controls="tab-compliance" id="tab-btn-compliance" onclick="switchTab('compliance')">✓ Compliance</button>
-    </div>
+    </div></nav>
 
     <div id="tab-chat" class="tab-panel" role="tabpanel" aria-hidden="false" aria-labelledby="tab-btn-chat">
       <div class="chat-box" id="chatBox">
@@ -278,7 +278,7 @@
     </div>
 
     <div id="tab-components" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-components">
-      <div class="section-title">Accessible Component Library</div>
+      <h2 class="section-title">Accessible Component Library</h2>
       <div class="comp-grid" id="componentsGrid">
         <div class="comp-card">
           <h3>Button <span class="comp-badge" id="btnContrast">4.5:1</span></h3>
@@ -431,7 +431,7 @@
           <h3>Tooltip <span class="comp-badge">4.5:1</span></h3>
           <div class="comp-demo">
             <span class="tooltip-wrap">
-              <span class="tooltip-trigger" tabindex="0" aria-describedby="tt1" role="button">Hover or focus me</span>
+              <span class="tooltip-trigger" tabindex="0" aria-describedby="tt1" role="button" onkeydown="if(event.key==='Enter'||event.key===' ')this.nextElementSibling.style.opacity='1'">Hover or focus me</span>
               <span class="tooltip-box" id="tt1" role="tooltip">This is a tooltip with keyboard support</span>
             </span>
           </div>
@@ -463,7 +463,7 @@
     </div>
 
     <div id="tab-loan" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-loan">
-      <div class="section-title">Loan Application</div>
+      <h2 class="section-title">Loan Application</h2>
       <div class="stepper" id="loanStepper" aria-label="Loan application progress">
         <div class="step active" id="ls1"><span class="step-num">1</span> Personal</div>
         <div class="step" id="ls2"><span class="step-num">2</span> Income</div>
@@ -478,18 +478,18 @@
     </div>
 
     <div id="tab-compliance" class="tab-panel" role="tabpanel" aria-hidden="true" aria-labelledby="tab-btn-compliance">
-      <div class="section-title">Accessibility Compliance Checker</div>
+      <h2 class="section-title">Accessibility Compliance Checker</h2>
       <div class="compliance-input-row">
-        <input type="url" id="complianceUrl" placeholder="https://example.com" aria-label="Website URL to audit for accessibility compliance" value="https://osam-voice-banking.onrender.com/" />
+        <input type="url" id="complianceUrl" placeholder="https://example.com" aria-label="URL to check accessibility" value="https://osam-voice-banking.onrender.com/" />
         <button id="complianceBtn" onclick="runCompliance()">✓ Check URL</button>
       </div>
       <div id="complianceResults" aria-live="polite"></div>
     </div>
-  </div>
+  </main>
 
-  <div class="footer">
+  <footer>
     OSAM — RBI Innovation Hub Project &bull; <a href="/api/health">API Health</a> &bull; <a href="/docs">API Docs</a>
-  </div>
+  </footer>
 
   <div id="modalContainer"></div>
   <div id="srAnnouncer" aria-live="polite" aria-atomic="true" class="sr-only"></div>
@@ -813,7 +813,7 @@
 
     function renderPersonalStep() {
       const v = loanData.personal || {};
-      return '<h3 class="card-title">' + l('personal') + '</h3><p class="card-subtitle">Step 1 of 5</p>' +
+      return '<h2 class="card-title">' + l('personal') + '</h2><p class="card-subtitle">Step 1 of 5</p>' +
         '<div class="form-group"><label for="loanName">' + l('name') + '</label><input type="text" id="loanName" value="' + (v.name || '') + '" placeholder="Rajesh Kumar" aria-describedby="errName" /><div id="errName" class="form-error"></div></div>' +
         '<div class="form-row"><div class="form-group"><label for="loanDob">' + l('dob') + '</label><input type="date" id="loanDob" value="' + (v.dob || '') + '" aria-describedby="errDob" /><div id="errDob" class="form-error"></div></div>' +
         '<div class="form-group"><label for="loanPan">' + l('pan') + '</label><input type="text" id="loanPan" value="' + (v.pan || '') + '" placeholder="ABCDE1234F" aria-describedby="errPan" /><div id="errPan" class="form-error"></div></div></div>' +
@@ -824,7 +824,7 @@
 
     function renderIncomeStep() {
       const v = loanData.income || {};
-      return '<h3 class="card-title">' + l('income') + '</h3><p class="card-subtitle">Step 2 of 5</p>' +
+      return '<h2 class="card-title">' + l('income') + '</h2><p class="card-subtitle">Step 2 of 5</p>' +
         '<div class="form-group"><label for="loanEmp">Employment Type</label><select id="loanEmp" onchange="renderIncomeStep()"><option value="salaried" ' + (v.emp === 'salaried' || !v.emp ? 'selected' : '') + '>Salaried</option><option value="self" ' + (v.emp === 'self' ? 'selected' : '') + '>Self-Employed</option><option value="business" ' + (v.emp === 'business' ? 'selected' : '') + '>Business</option></select></div>' +
         '<div class="form-group"><label for="loanIncome">Monthly Income (₹)</label><input type="number" id="loanIncome" min="5000" max="500000" step="1000" value="' + (v.income || '50000') + '" /></div>' +
         '<div class="form-group"><label for="loanCompany">' + (document.getElementById('loanEmp') && document.getElementById('loanEmp').value === 'salaried' ? 'Company Name' : 'Business Name') + '</label><input type="text" id="loanCompany" value="' + (v.company || '') + '" placeholder="ABC Corp" /></div>' +
@@ -852,7 +852,7 @@
       const existingEmi = loanData.income ? loanData.income.existingEmi : 0;
       const totalEmi = emi + existingEmi;
       const eligible = totalEmi <= income * 0.5;
-      return '<h3 class="card-title">' + l('amount') + '</h3><p class="card-subtitle">Step 3 of 5 — EMI Calculator</p>' +
+      return '<h2 class="card-title">' + l('amount') + '</h2><p class="card-subtitle">Step 3 of 5 — EMI Calculator</p>' +
         '<div class="form-group"><label for="loanAmt">Loan Amount: ₹' + amt.toLocaleString() + '</label><input type="range" id="loanAmt" min="10000" max="5000000" step="10000" value="' + amt + '" oninput="renderAmountStep()" /></div>' +
         '<div class="form-group"><label for="loanTenure">Tenure: ' + tenure + ' months (' + (tenure/12).toFixed(1) + ' years)</label><input type="range" id="loanTenure" min="6" max="60" step="1" value="' + tenure + '" oninput="renderAmountStep()" /></div>' +
         '<div class="emi-display"><div class="amount">₹' + Math.round(emi).toLocaleString() + '</div><div class="sub">Monthly EMI at ' + rate + '% p.a.</div>' +
@@ -864,7 +864,7 @@
     }
 
     function renderDocsStep() {
-      return '<h3 class="card-title">' + l('docs') + '</h3><p class="card-subtitle">Step 4 of 5</p>' +
+      return '<h2 class="card-title">' + l('docs') + '</h2><p class="card-subtitle">Step 4 of 5</p>' +
         '<div class="doc-upload"><label for="docPan">📄 PAN Card</label><input type="file" id="docPan" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
         '<div class="doc-upload"><label for="docAadhaar">📄 Aadhaar Card</label><input type="file" id="docAadhaar" accept=".pdf,.jpg,.jpeg,.png" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
         '<div class="doc-upload"><label for="docStatement">📄 Bank Statement (3 months)</label><input type="file" id="docStatement" accept=".pdf" onchange="showDocStatus(this)" /><span class="doc-status"></span></div>' +
@@ -886,8 +886,8 @@
       const p = loanData.personal || {};
       const i = loanData.income || {};
       const a = loanData.amount || {};
-      return '<h3 class="card-title">' + l('review') + '</h3><p class="card-subtitle">Step 5 of 5 — Review your application</p>' +
-        '<table class="review-table"><tr><td>' + l('name') + '</td><td>' + (p.name || '-') + '</td></tr><tr><td>' + l('dob') + '</td><td>' + (p.dob || '-') + '</td></tr><tr><td>' + l('pan') + '</td><td>' + (p.pan || '-') + '</td></tr><tr><td>' + l('phone') + '</td><td>' + (p.phone || '-') + '</td></tr><tr><td>' + l('email') + '</td><td>' + (p.email || '-') + '</td></tr><tr><td>Income</td><td>₹' + (i.income || 0).toLocaleString() + '/mo</td></tr><tr><td>Loan</td><td>₹' + (a.amount || 0).toLocaleString() + '</td></tr><tr><td>Tenure</td><td>' + (a.tenure || 0) + ' months</td></tr><tr><td>EMI</td><td>₹' + Math.round(calcEMI(a.amount || 0, 10.5, a.tenure || 36)).toLocaleString() + '/mo</td></tr></table>' +
+      return '<h2 class="card-title">' + l('review') + '</h2><p class="card-subtitle">Step 5 of 5 — Review your application</p>' +
+        '<table class="review-table"><tr><th scope="row">' + l('name') + '</th><td>' + (p.name || '-') + '</td></tr><tr><th scope="row">' + l('dob') + '</th><td>' + (p.dob || '-') + '</td></tr><tr><th scope="row">' + l('pan') + '</th><td>' + (p.pan || '-') + '</td></tr><tr><th scope="row">' + l('phone') + '</th><td>' + (p.phone || '-') + '</td></tr><tr><th scope="row">' + l('email') + '</th><td>' + (p.email || '-') + '</td></tr><tr><th scope="row">Income</th><td>₹' + (i.income || 0).toLocaleString() + '/mo</td></tr><tr><th scope="row">Loan</th><td>₹' + (a.amount || 0).toLocaleString() + '</td></tr><tr><th scope="row">Tenure</th><td>' + (a.tenure || 0) + ' months</td></tr><tr><th scope="row">EMI</th><td>₹' + Math.round(calcEMI(a.amount || 0, 10.5, a.tenure || 36)).toLocaleString() + '/mo</td></tr></table>' +
         '<div class="form-group" style="margin-top:12px;"><label class="demo-label"><input type="checkbox" id="loanConfirm" /> ' + l('confirming') + '</label></div>' +
         '<div class="form-actions"><button class="btn-back" onclick="loanStep--;renderLoanStep()" aria-label="Back to step 4: Documents">' + l('back') + '</button>' +
         '<button class="btn-continue" id="loanSubmitBtn" onclick="submitLoan()" disabled aria-label="Submit loan application">' + l('submit') + '</button></div>';
