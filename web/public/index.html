@@ -881,10 +881,12 @@
       let valid = true;
       if (!name.value || name.value.trim().length < 3) { name.setAttribute('aria-invalid', 'true'); document.getElementById('errName').textContent = 'Min 3 characters required'; valid = false; } else { name.removeAttribute('aria-invalid'); document.getElementById('errName').textContent = ''; }
       if (!dob.value) { dob.setAttribute('aria-invalid', 'true'); document.getElementById('errDob').textContent = 'Date of birth required'; valid = false; } else { const age = (new Date() - new Date(dob.value)) / 31557600000; if (age < 18) { dob.setAttribute('aria-invalid', 'true'); document.getElementById('errDob').textContent = 'Must be 18+'; valid = false; } else { dob.removeAttribute('aria-invalid'); document.getElementById('errDob').textContent = ''; } }
-      if (!pan.value || pan.value.trim().length < 5) { pan.setAttribute('aria-invalid', 'true'); document.getElementById('errPan').textContent = 'Valid PAN required'; valid = false; } else { pan.removeAttribute('aria-invalid'); document.getElementById('errPan').textContent = ''; }
-      if (!phone.value || phone.value.trim().length < 10) { phone.setAttribute('aria-invalid', 'true'); document.getElementById('errPhone').textContent = '10-digit mobile required'; valid = false; } else { phone.removeAttribute('aria-invalid'); document.getElementById('errPhone').textContent = ''; }
-      if (!email.value || !email.value.includes('@')) { email.setAttribute('aria-invalid', 'true'); document.getElementById('errEmail').textContent = 'Valid email required'; valid = false; } else { email.removeAttribute('aria-invalid'); document.getElementById('errEmail').textContent = ''; }
-      if (valid) { loanData.personal = { name: name.value.trim(), dob: dob.value, pan: pan.value.trim(), phone: phone.value.trim(), email: email.value.trim() }; }
+      const panVal = pan.value.trim().toUpperCase();
+      if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(panVal)) { pan.setAttribute('aria-invalid', 'true'); document.getElementById('errPan').textContent = 'Enter valid PAN (e.g. ABCDE1234F)'; valid = false; } else { pan.value = panVal; pan.removeAttribute('aria-invalid'); document.getElementById('errPan').textContent = ''; }
+      const phoneVal = phone.value.trim();
+      if (!/^[6-9][0-9]{9}$/.test(phoneVal)) { phone.setAttribute('aria-invalid', 'true'); document.getElementById('errPhone').textContent = 'Enter valid 10-digit mobile number'; valid = false; } else { phone.removeAttribute('aria-invalid'); document.getElementById('errPhone').textContent = ''; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { email.setAttribute('aria-invalid', 'true'); document.getElementById('errEmail').textContent = 'Enter valid email address'; valid = false; } else { email.removeAttribute('aria-invalid'); document.getElementById('errEmail').textContent = ''; }
+      if (valid) { loanData.personal = { name: name.value.trim(), dob: dob.value, pan: panVal, phone: phoneVal, email: email.value.trim() }; }
       return valid;
     }
 
@@ -1097,18 +1099,27 @@
     });
 
     async function submitLoan() {
+      const p = loanData.personal || {};
+      const i = loanData.income || {};
       const a = loanData.amount || {};
+      const d = loanData.docs || {};
       const btn = document.getElementById('loanSubmitBtn');
       btn.disabled = true;
       btn.textContent = 'Submitting...';
       try {
         const res = await fetch(API + '/api/loan/apply', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount: a.amount || 500000, purpose: 'Personal Loan from OSAM Portal' })
+          body: JSON.stringify({
+            name: p.name || '', pan: p.pan || '', phone: p.phone || '', email: p.email || '',
+            dob: p.dob || '', income: i.income || 0, existing_emi: i.existingEmi || 0,
+            amount: a.amount || 500000, tenure: a.tenure || 36,
+            employment: (document.getElementById('loanEmp') && document.getElementById('loanEmp').value) || 'salaried',
+            company: i.company || '', docs: Object.keys(d).join(',')
+          })
         });
         const data = await res.json();
         const c = document.getElementById('loanFormContainer');
-        c.innerHTML = '<div class="success-screen"><div class="icon">🎉</div><h2>Application Submitted!</h2><p>Your loan application ID is</p><p class="app-id">' + data.application_id + '</p><p style="margin-top:12px;">We will contact you within 48 hours.</p><button class="btn-demo btn-primary btn-md" style="margin-top:16px;" onclick="loanStep=0;loanData={};otpVerified=false;panVerified=false;otpCode='';renderLoanStep()">Apply Again</button></div>';
+        c.innerHTML = '<div class="success-screen"><div class="icon">🎉</div><h2>Application Submitted!</h2><p>Your loan application ID is</p><p class="app-id">' + data.application_id + '</p><p style="margin-top:12px;">We will contact you within 48 hours.</p><button class="btn-demo btn-primary btn-md" style="margin-top:16px;" onclick="loanStep=0;loanData={};otpVerified=false;panVerified=false;otpCode='';renderLoanStep()">Apply Again</button><button class="btn-demo btn-outline btn-md" style="margin-top:8px;" onclick="viewApplications()">📋 View All Applications</button></div>';
         document.querySelectorAll('#loanStepper .step').forEach(s => s.className = 'step completed');
         const lbl = document.getElementById('ls6');
         if (lbl) { lbl.className = 'step completed'; lbl.querySelector('.step-num').textContent = '✓'; }
@@ -1116,6 +1127,31 @@
         alert('Error: ' + e.message);
         btn.disabled = false;
         btn.textContent = 'Submit Application';
+      }
+    }
+
+    async function viewApplications() {
+      try {
+        const res = await fetch(API + '/api/loan/applications');
+        const data = await res.json();
+        const c = document.getElementById('loanFormContainer');
+        if (!data.applications || data.applications.length === 0) {
+          c.innerHTML = '<div class="success-screen"><div class="icon">📋</div><h2>No Applications</h2><p>No loan applications found.</p><button class="btn-demo btn-primary btn-md" style="margin-top:16px;" onclick="loanStep=0;loanData={};renderLoanStep()">Apply Now</button></div>';
+          return;
+        }
+        const maxShow = 10;
+        const apps = data.applications.slice(-maxShow).reverse();
+        let rows = apps.map(function(a) {
+          const d = a.created_at || '';
+          const time = d ? new Date(d).toLocaleDateString() + ' ' + new Date(d).toLocaleTimeString() : '';
+          return '<tr><td>' + (a.application_id || '-') + '</td><td>' + (a.name || '-') + '</td><td>₹' + (a.amount || 0).toLocaleString() + '</td><td>' + (a.status || '-') + '</td><td style="font-size:0.65rem;color:#64748b;">' + time + '</td></tr>';
+        }).join('');
+        c.innerHTML = '<h2 class="card-title">📋 Submitted Applications</h2><p class="card-subtitle">Last ' + maxShow + ' applications</p>' +
+          '<div style="overflow-x:auto;"><table class="review-table" style="width:100%;"><thead><tr style="background:rgba(99,102,241,0.06);"><th style="padding:8px 10px;text-align:left;color:#a5b4fc;font-size:0.7rem;">ID</th><th style="padding:8px 10px;text-align:left;color:#a5b4fc;font-size:0.7rem;">Name</th><th style="padding:8px 10px;text-align:left;color:#a5b4fc;font-size:0.7rem;">Amount</th><th style="padding:8px 10px;text-align:left;color:#a5b4fc;font-size:0.7rem;">Status</th><th style="padding:8px 10px;text-align:left;color:#a5b4fc;font-size:0.7rem;">Time</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+          '<button class="btn-demo btn-primary btn-md" style="margin-top:12px;" onclick="loanStep=0;loanData={};otpVerified=false;panVerified=false;otpCode='';renderLoanStep()">Apply Again</button>';
+        document.querySelectorAll('#loanStepper .step').forEach(s => { s.className = 'step completed'; const n = s.querySelector('.step-num'); if (n) n.textContent = '✓'; });
+      } catch(e) {
+        document.getElementById('loanFormContainer').innerHTML = '<div class="alert alert-error">Failed to load applications: ' + e.message + '</div>';
       }
     }
 

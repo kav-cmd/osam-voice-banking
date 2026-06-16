@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 from .scripts import SCRIPTS, LANGUAGE_NAMES
 from .intent import detect_intent
-from .ippb_mock import get_balance, apply_loan, get_nearby_branches
+from .ippb_mock import get_balance, get_nearby_branches
 from .voice import transcribe, load_asr
 from .tts import text_to_speech
 from .compliance import generate_accessibility_report, IS_17802_RULES, audit_url
@@ -76,8 +76,19 @@ class BalanceResponse(BaseModel):
 
 
 class LoanApplyRequest(BaseModel):
-    amount: float
-    purpose: str
+    name: str = ""
+    pan: str = ""
+    phone: str = ""
+    email: str = ""
+    dob: str = ""
+    income: float = 0
+    existing_emi: float = 0
+    amount: float = 500000
+    tenure: int = 36
+    employment: str = "salaried"
+    company: str = ""
+    docs: str = ""
+    purpose: str = "Personal Loan from OSAM Portal"
     language: str = "hi"
 
 
@@ -212,18 +223,47 @@ async def check_balance(req: BalanceRequest):
     return BalanceResponse(balance=balance, response_text=response_text, audio_url=audio_url)
 
 
+APPLICATIONS: list[dict] = []
+APPLICATION_ID_COUNTER: int = 1000
+
 @app.post("/api/loan/apply", response_model=LoanApplyResponse)
 async def apply_for_loan(req: LoanApplyRequest):
     lang = req.language if req.language in SCRIPTS else "en"
-    result = apply_loan(req.amount, req.purpose)
-    response_text = _get_script("loan_submitted", lang, id=result["application_id"])
+    global APPLICATION_ID_COUNTER
+    APPLICATION_ID_COUNTER += 1
+    app_id = f"OSAM-{APPLICATION_ID_COUNTER}"
+    record = {
+        "application_id": app_id,
+        "name": req.name,
+        "pan": req.pan,
+        "phone": req.phone,
+        "email": req.email,
+        "dob": req.dob,
+        "income": req.income,
+        "existing_emi": req.existing_emi,
+        "amount": req.amount,
+        "tenure": req.tenure,
+        "employment": req.employment,
+        "company": req.company,
+        "docs": req.docs,
+        "purpose": req.purpose,
+        "status": "submitted",
+        "created_at": str(uuid.uuid4()),
+    }
+    APPLICATIONS.append(record)
+    response_text = _get_script("loan_submitted", lang, id=app_id)
     audio_url = _generate_audio(response_text, lang)
     return LoanApplyResponse(
-        application_id=result["application_id"],
-        status=result["status"],
+        application_id=app_id,
+        status="submitted",
         response_text=response_text,
         audio_url=audio_url,
     )
+
+
+@app.get("/api/loan/applications")
+async def list_applications():
+    return {"applications": APPLICATIONS}
 
 
 @app.post("/api/branch/nearby", response_model=BranchResponse)
