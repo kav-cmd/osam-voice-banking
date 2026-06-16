@@ -7,7 +7,7 @@ from typing import Optional
 from datetime import datetime
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form, Depends
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response, HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -325,6 +325,19 @@ async def check_balance(req: BalanceRequest):
     return BalanceResponse(balance=balance, response_text=response_text, audio_url=audio_url)
 
 
+async def get_current_user_if_token(authorization: Optional[str] = Header(None)):
+    """Return user if valid token, None otherwise (no 401)."""
+    if not authorization:
+        return None
+    from .auth import decode_token
+    payload = decode_token(authorization.replace("Bearer ", ""))
+    if payload is None:
+        return None
+    async with async_session() as session:
+        result = await session.execute(select(User).where(User.username == payload["sub"]))
+        return result.scalar_one_or_none()
+
+
 # ─── Loan Applications ───────────────────────────────────────────────────────
 
 @app.post("/api/loan/apply", response_model=LoanApplyResponse)
@@ -533,19 +546,6 @@ async def serve_web_ui():
     if os.path.isfile(WEB_UI_PATH):
         return HTMLResponse(open(WEB_UI_PATH, encoding="utf-8").read())
     return HTMLResponse("<h1>OSAM Voice Banking</h1><p>Web UI not found. Run the backend server.</p>")
-
-
-async def get_current_user_if_token(authorization: Optional[str] = Header(None)):
-    """Return user if valid token, None otherwise (no 401)."""
-    if not authorization:
-        return None
-    from .auth import decode_token
-    payload = decode_token(authorization.replace("Bearer ", ""))
-    if payload is None:
-        return None
-    async with async_session() as session:
-        result = await session.execute(select(User).where(User.username == payload["sub"]))
-        return result.scalar_one_or_none()
 
 
 if __name__ == "__main__":
