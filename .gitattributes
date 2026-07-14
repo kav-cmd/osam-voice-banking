@@ -1,0 +1,3 @@
+# Keep language stats representative of the actual stack (FastAPI backend + Flutter mobile)
+web/public/index.html linguist-vendored
+docs/** linguist-documentation

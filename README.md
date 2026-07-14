@@ -1,7 +1,7 @@
 # OSAM — Voice Banking for India
 
 > **O**pen **S**ource **A**ccessible **M**obile Banking  
-> Reserve Bank Innovation Hub (RBIH) — Confidential Working Paper
+> Prototype built as a concept submission for the Reserve Bank Innovation Hub (RBIH)
 
 OSAM is a voice-enabled banking system that integrates with IPPB (India Post Payments Bank) to provide accessible banking in Hindi, Tamil, and English. Built for users who cannot read or see — voice is the interface.
 
